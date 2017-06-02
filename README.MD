@@ -41,7 +41,7 @@ Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改�
 安装依赖
 
 ```
-cd 
+cd Hawkeye
 virtualenv --python=/usr/local/bin/python3 venv
 source venv/bin/activate
 pip install -r deploy/requirements.txt
