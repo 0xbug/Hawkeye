@@ -31,7 +31,7 @@
 
 克隆项目到本地
 
-```
+```bash
 git clone https://github.com/0xbug/Hawkeye.git --depth 1
 ```
 
@@ -40,7 +40,7 @@ Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改�
 
 安装依赖
 
-```
+```bash
 cd Hawkeye
 virtualenv --python=/usr/local/bin/python3 venv
 source venv/bin/activate
@@ -59,13 +59,20 @@ vim config.ini
 ### 需要修改的配置
 
 - `github` 帐户配置
-```
+```conf
 [GitHub]
 USERNAME = 帐号
 PASSWORD = 密码
 ```
 - `MongoDB` 认证配置(可选)
+
+先创建用户
+```bash
+mongo
+>db.createUser({user:'root',pwd:'password',roles:[{role:'dbOwner',db:'Hawkeye'}]})
 ```
+然后修改配置文件
+```conf
 [MongoDB]
 HOST = localhost
 PORT = 27017
@@ -75,7 +82,7 @@ PASSWORD = 密码
 
 - 告警配置（`ENABLE`:是否开启告警功能）
 
-```
+```conf
 [Notice]
 ENABLE = 1
 MAIL_SERVER = 邮件服务器
