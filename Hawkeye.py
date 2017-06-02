@@ -87,8 +87,6 @@ def tag_details(tag):
 @app.route('/view/leakage/<leakage_id>')
 def leakage_details(leakage_id):
     results = leakage_col.find_one({'_id': leakage_id})
-    print(results.get('ignore'))
-    print(results.get('security'))
     return render_template('detail.html', results=results)
 
 
@@ -102,8 +100,6 @@ def leakage_code(leakage_id):
 @app.route('/deal/leakage', methods=['POST'])
 def deal_leakage():
     data = request.get_json()
-    print(int(data['security']))
-    print(int(data['ignore']))
     desc = base64.b64encode(data['desc'].encode(encoding='utf-8')).decode()
 
     leakage_col.update({'_id': data['id']}, {'$set': {'security': int(
