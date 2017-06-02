@@ -3,6 +3,12 @@ USERNAME =
 PASSWORD =
 ERROR = We could not perform this search
 
+[MongoDB]
+HOST = localhost
+PORT = 27017
+ACCOUNT = 
+PASSWORD = 
+
 [Leakage]
 NODES = //*[@id="code_search_results"]/div[1]/div[*]
 DATETIME = //*[@id="code_search_results"]/div[1]/div[{}]/div[1]/div/span[2]/relative-time
