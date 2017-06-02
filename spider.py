@@ -15,12 +15,6 @@ from time import sleep
 import hashlib
 import sys
 
-cli = MongoClient()
-db = cli.Hawkeye
-leakage_col = db.leakage
-query_col = db.query
-blacklist_col = db.blacklist
-notice_col = db.notice
 
 base_path = os.path.split(os.path.realpath(__file__))[0]
 conf_path = base_path + '/config.ini'
@@ -35,6 +29,21 @@ def hawkeye_conf():
 def get_conf(section, option):
     config = hawkeye_conf()
     return config.get(section=section, option=option)
+
+
+cli = MongoClient(host=get_conf('MongoDB', 'HOST'),
+                  port=int(get_conf('MongoDB', 'PORT')))
+try:
+    db = cli.Hawkeye
+    db.authenticate(get_conf('MongoDB', 'ACCOUNT'),
+                    get_conf('MongoDB', 'PASSWORD'))
+except BaseException:
+    db = cli.Hawkeye
+
+leakage_col = db.leakage
+query_col = db.query
+blacklist_col = db.blacklist
+notice_col = db.notice
 
 
 def create_session():
@@ -134,7 +143,7 @@ def crawl(query):
                     leakage['ignore'] = 0
                     leakage_col.save(leakage)
                     try:
-                        if int(get_conf('Notice','ENABLE')):
+                        if int(get_conf('Notice', 'ENABLE')):
                             send_mail(
                                 '命中规则: {}\n文件地址: {}\n\n\n\n\n 代码： \n{}'.format(
                                     leakage['tag'], leakage['link'], code))

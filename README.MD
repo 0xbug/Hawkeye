@@ -64,6 +64,14 @@ vim config.ini
 USERNAME = 帐号
 PASSWORD = 密码
 ```
+- `MongoDB` 认证配置(可选)
+```
+[MongoDB]
+HOST = localhost
+PORT = 27017
+ACCOUNT = 帐号
+PASSWORD = 密码
+```
 
 - 告警配置（`ENABLE`:是否开启告警功能）
 

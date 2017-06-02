@@ -3,12 +3,36 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from crontab import CronTab
+import configparser
 import os
 import hashlib
 import base64
 
-cli = MongoClient()
-db = cli.Hawkeye
+
+base_path = os.path.split(os.path.realpath(__file__))[0]
+conf_path = base_path + '/config.ini'
+
+
+def hawkeye_conf():
+    config = configparser.ConfigParser()
+    config.read(conf_path)
+    return config
+
+
+def get_conf(section, option):
+    config = hawkeye_conf()
+    return config.get(section=section, option=option)
+
+
+cli = MongoClient(host=get_conf('MongoDB', 'HOST'),
+                  port=int(get_conf('MongoDB', 'PORT')))
+try:
+    db = cli.Hawkeye
+    db.authenticate(get_conf('MongoDB', 'ACCOUNT'),
+                    get_conf('MongoDB', 'PASSWORD'))
+except BaseException:
+    db = cli.Hawkeye
+
 leakage_col = db.leakage
 query_col = db.query
 blacklist_col = db.blacklist
