@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+        <title>GitHub 监控平台</title>
+        <link rel="stylesheet" href={{ url_for('static',filename='css/element-ui.css') }}>
+        <script src={{ url_for('static',filename='js/vue.min.js') }}></script>
+        <script src={{ url_for('static',filename='js/element-ui.js') }}></script>
+
+        {% block static %}
+            <script src={{ url_for('static',filename='js/fetch.js') }}></script>
+        {% endblock static %}
+    {% endblock head %}
+</head>
+<body class="body">
+<style>
+    body {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #324057;
+        background-color: #f3f9f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    body a {
+        color: #0366d6;
+        text-decoration: none;
+        background-color: transparent;
+    }
+
+    .el-menu-item a {
+        text-decoration: none;
+        display: block;
+    }
+</style>
+{% block style %}
+{% endblock style %}
+
+{% block template %}
+    <div id="navigation" class="navigation">
+        <el-menu theme="dark" :default-active="activeIndex" mode="horizontal">
+            <el-row :gutter="10">
+
+                <el-menu-item index="1"><a href="/">GitHub 监控平台</a></el-menu-item>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-document"></i>概览</template>
+                    <div v-for="item in statistics">
+                        <el-menu-item index="22">
+                            <a :href="'/view/tag/'+item._id">
+                                ${item._id}
+                                <el-badge :value=item.value></el-badge>
+                            </a>
+                        </el-menu-item>
+                    </div>
+                </el-submenu>
+                <el-menu-item index="3">
+                    <a href="/processing"><i class="el-icon-time"></i>处理中</a>
+                </el-menu-item>
+                <el-menu-item index="4">
+                    <a href="/processed"><i class="el-icon-check"></i>归档</a>
+                </el-menu-item>
+
+                <el-menu-item index="5">
+                    <a href="/setting"><i class="el-icon-setting"></i>配置</a>
+                </el-menu-item>
+            </el-row>
+        </el-menu>
+
+
+    </div>
+
+{% endblock template %}
+{% block script %}
+{% endblock script %}
+<script>
+    var statistics = [];
+    var vm = new Vue({
+        el: '#navigation',
+        data: {
+            activeIndex: '2', statistics: []
+        },
+        delimiters: ["${", "}"],
+        methods: {
+            fetchData: function () {
+                fetch('/statistics').then(function (response) {
+
+                    return response.json();
+                }).then(function (json) {
+                    vm.statistics = json.result;
+                    statistics = json.result;
+                }).catch(function (ex) {
+                    console.log('parsing failed', ex)
+                });
+            }
+
+        },
+        mounted: function () {
+            let self = this;
+            self.fetchData();
+            self.$nextTick(function () {
+            });
+        }
+    });
+</script>
+</body>
+</html>

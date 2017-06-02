@@ -82,6 +82,9 @@ celerybeat-schedule
 # dotenv
 .env
 
+# config
+config.ini
+
 # virtualenv
 .venv
 venv/
@@ -99,3 +102,5 @@ ENV/
 
 # mypy
 .mypy_cache/
+deploy/supervisor.conf
+deploy/Hawkeye.conf
