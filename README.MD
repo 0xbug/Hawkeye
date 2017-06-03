@@ -100,3 +100,9 @@ python Hawkeye.py
 ## 部署
 
 建议使用 `supervisor` 设置成开机自启，并监控进程，配置文件 `deploy/Hawkeye.conf.example`
+
+## 说明
+
+> 如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！
+
+> 或者您可以 ["follow"](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下，我会不断开源更多有关甲方安全的项目。
