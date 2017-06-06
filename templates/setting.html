@@ -155,7 +155,7 @@
                             :key="tag"
                             v-for="tag in dynamicTags"
                             :closable="true"
-                            :close-transition="false"
+                            :close-transition="true"
                             @close="handleClose(tag)"
                     >
                         ${tag.keyword}
@@ -184,7 +184,7 @@
                             :key="tag"
                             v-for="tag in dynamicMail"
                             :closable="true"
-                            :close-transition="false"
+                            :close-transition="true"
                             @close="handleNoticeClose(tag)"
                     >
                         ${tag.keyword}
