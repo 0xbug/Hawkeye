@@ -1,0 +1,117 @@
+<template>
+
+  <el-card class="item">
+    <el-tooltip content="邮箱格式：username@domain.com" placement="bottom-end">
+      <i class="el-icon-information"></i>
+    </el-tooltip>
+    <el-input
+      class="input-new-tag"
+      v-if="inputVisible"
+      v-model="inputValue"
+      ref="saveTagInput"
+      size="mini"
+      @keyup.enter.native="handleInputNoticeConfirm"
+      @blur="handleInputNoticeConfirm"
+    >
+    </el-input>
+    <el-button v-else size="small" @click="showInput">添加</el-button>
+    <el-tag
+      :key="mail"
+      v-for="mail in noticeMails"
+      :closable="true"
+      :close-transition="true"
+      @close="handleDeleteNotice(mail)"
+    >
+      {{mail.keyword}}
+    </el-tag>
+
+  </el-card>
+
+
+</template>
+<script>
+  export default {
+    data () {
+      return {
+        enable: false,
+        inputVisible: false,
+        inputValue: '',
+        noticeMails: []
+      }
+    },
+    methods: {
+      showInput() {
+        this.inputVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus();
+        });
+      }, handleInputNoticeConfirm() {
+        if (this.inputValue) {
+          this.noticeMails.push({'keyword': this.inputValue});
+          this.axios.post(this.GLOBAL.settingNotice, {'keyword': this.inputValue})
+            .then((response) => {
+              this.$message({
+                message: response.data.msg,
+                type: 'success'
+              });
+              this.inputVisible = false;
+              this.noticeMails = response.data.result;
+
+            })
+            .catch((error) => {
+              this.$message({
+                message: error,
+                type: 'error'
+              });
+              this.inputVisible = false;
+              this.inputValue = ''
+
+            });
+        }
+
+      },
+
+      handleDeleteNotice(mail) {
+        this.noticeMails.splice(this.noticeMails.indexOf(mail), 1);
+        this.axios.delete(`${this.GLOBAL.settingNotice}?keyword=${mail.keyword}`)
+          .then((response) => {
+            this.$message({
+              message: response.data.msg,
+              type: 'success'
+            });
+            this.inputVisible = false;
+            this.noticeMails = response.data.result;
+          })
+          .catch((error) => {
+            this.$message({
+              message: error,
+              type: 'error'
+            });
+            this.inputVisible = false;
+            this.inputValue = ''
+
+          });
+      },
+      fetchNoticeMails(){
+        this.axios.get(this.GLOBAL.settingNotice)
+          .then((response) => {
+            this.noticeMails = response.data.result;
+          })
+          .catch((error) => {
+            this.$message({
+              message: error,
+              type: 'error'
+            });
+
+
+          });
+      }
+
+    },
+    mounted: function () {
+      this.fetchNoticeMails();
+      this.$nextTick(function () {
+      });
+    }
+  }
+</script>

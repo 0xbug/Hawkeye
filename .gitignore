@@ -104,3 +104,5 @@ ENV/
 .mypy_cache/
 deploy/supervisor.conf
 deploy/Hawkeye.conf
+fe/node_modules
+.idea

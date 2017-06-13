@@ -1,0 +1,159 @@
+<template>
+  <div>
+    <el-breadcrumb separator="/" style="margin-left: 20px">
+  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+
+      <el-breadcrumb-item>
+        {{leakageInfo.tag}}
+      </el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-row :gutter="6">
+      <el-col :xs="24" :sm="24" :md="16" :lg="16">
+      <el-card>
+  
+        <div slot="title" class="clearfix">
+          <span style="line-height: 36px;">
+            <Icon type="code" style="margin-right: 4px;"></Icon>
+            <a :href="leakageInfo.link" target="_blank">可疑项目</a>
+          </span>
+        </div>
+        <div class="code-list" id="codelist">
+          <div v-html="leakageInfo.detail"></div>
+        </div>
+      </el-card>
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="8" :lg="8">
+      <el-card>
+        <div style="padding: 14px;">
+          <Form :model="form" :label-width="80">
+            <Form-item label="是否安全">
+              <Radio-group v-model="form.security">
+  
+                <Radio :label="1">安全</Radio>
+                <Radio :label="0">涉密</Radio>
+              </Radio-group>
+            </Form-item>
+            <Form-item label="忽略仓库">
+              <Radio-group v-model="form.ignore">
+  
+                <Radio :label="1">忽略</Radio>
+                <Radio :label="0">监控</Radio>
+              </Radio-group>
+            </Form-item>
+            <Form-item label="备注">
+  
+              <Input v-model="form.desc" type="textarea" :autosize="{minel-rows: 2,maxel-rows: 5}" placeholder="请输入..."></Input>
+  
+            </Form-item>
+            <Form-item>
+              <Button type="primary" @click="dealLeakage(form)">确认</Button>
+  
+            </Form-item>
+          </Form>
+        </div>
+      </el-card>
+      </el-col>
+      <el-col :span="24" v-if="code">
+      <el-card>
+        <div slot="title" class="clearfix">
+          <span style="line-height: 36px;">
+            <Icon type="code" style="margin-right: 4px;"></Icon>
+            <a :href="leakageInfo.link" target="_blank">可疑文件</a>
+          </span>
+        </div>
+        <highlight-code :lang="leakageInfo.language">
+  
+          {{code}}
+        </highlight-code>
+  
+      </el-card>
+      </el-col>
+    </el-row>
+  
+  </div>
+</template>
+<script>
+import { Base64 } from 'js-base64';
+import 'highlight.js/styles/github.css';
+
+export default {
+  data() {
+    return {
+      leakageInfo: {},
+      code: '',
+      form: { security: 1, ignore: 1, desc: '' }
+    }
+  }, methods: {
+    fetchInfoData() {
+      this.axios.get(`${this.GLOBAL.leakage}/${this.$route.params.id}/info`)
+        .then((response) => {
+          this.$Message.info({
+            content: response.data.msg,
+            duration: 10,
+            closable: true
+          });
+          this.leakageInfo = response.data.result[0];
+          this.form.security = this.leakageInfo.security;
+          this.form.project = this.leakageInfo.project;
+          this.form.ignore = this.leakageInfo.ignore;
+          if (this.leakageInfo.desc){
+            this.form.desc = Base64.decode(this.leakageInfo.desc);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    fetchCodeData() {
+      this.axios.get(`${this.GLOBAL.leakage}/${this.$route.params.id}/code`)
+        .then((response) => {
+          this.$Message.info({
+            content: response.data.msg,
+            duration: 10,
+            closable: true
+          });
+          this.code = Base64.decode(response.data.result[0].code);
+
+        })
+        .catch((error) => {
+          this.$Message.info({
+            content: error,
+            duration: 10,
+            closable: true
+          });
+        });
+    },
+    dealLeakage(form) {
+      this.form.id = this.$route.params.id;
+      this.axios.post(this.GLOBAL.dealLeakage, this.form
+      )
+        .then((response) => {
+          this.$Message.info({
+            content: response.data.msg,
+            duration: 10,
+            closable: true
+          });
+        })
+        .catch((error) => {
+          this.$Message.info({
+            content: error,
+            duration: 10,
+            closable: true
+          });
+        });
+    }
+  },
+  mounted() {
+    this.fetchInfoData();
+    this.fetchCodeData();
+    this.$nextTick(function () {
+
+    });
+  }
+}
+</script>
+
+<style scoped>
+@import "https://assets-cdn.github.com/assets/frameworks-3b630179b3ba661bed136319970519c14eae34456b7cf575d1126c208cd61d0e.css";
+@import "https://assets-cdn.github.com/assets/github-adef29b21c28620124e601ee69f4b175d336f5fba00d9b75685d91beb2c6373d.css";
+</style>

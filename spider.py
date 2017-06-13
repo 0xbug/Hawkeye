@@ -15,7 +15,6 @@ from time import sleep
 import hashlib
 import sys
 
-
 base_path = os.path.split(os.path.realpath(__file__))[0]
 conf_path = base_path + '/config.ini'
 
@@ -138,7 +137,9 @@ def crawl(query):
                         'title']
                     leakage['tag'] = query['tag']
                     leakage['detail'] = etree.tostring(
-                        node, pretty_print=True, encoding='unicode')
+                        node, pretty_print=True, encoding='unicode').replace('{{', '<<').replace('}}', '>>').replace(
+                        'href="/' + leakage['project'],
+                        'target="_blank" href="https://github.com/' + leakage['project'])
                     leakage['security'] = 0
                     leakage['ignore'] = 0
                     leakage_col.save(leakage)

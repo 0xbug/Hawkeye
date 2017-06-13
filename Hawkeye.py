@@ -3,11 +3,13 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from crontab import CronTab
+# from flask_cors import CORS, cross_origin
+from flask_restful import Resource, Api, reqparse
 import configparser
+import json
 import os
 import hashlib
 import base64
-
 
 base_path = os.path.split(os.path.realpath(__file__))[0]
 conf_path = base_path + '/config.ini'
@@ -39,170 +41,203 @@ blacklist_col = db.blacklist
 notice_col = db.notice
 
 app = Flask(__name__)
+api = Api(app)
+# CORS(app)
 
 
 @app.route('/')
-@app.route('/processed')
-@app.route('/processing')
 def index():
     return render_template('index.html')
 
 
-@app.route('/statistics')
-def statistics():
-    pipeline = [
-        {'$match': {'security': 0}},
-        {'$group': {'_id': '$tag', 'value': {'$sum': 1}}},
-    ]
+class Leakage(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('status', type=str, help='')
+        parser.add_argument('tag', type=str, help='')
+        parser.add_argument('limit', type=int, default=10, help='')
+        parser.add_argument('from', type=int, default=1, help='')
+        args = parser.parse_args()
+        status = json.loads(args.get('status'))
+        filters = status
 
-    results = list(leakage_col.aggregate(pipeline))
-    if not len(results):
+        if args.get('tag'):
+            filters = dict({'tag': args.get('tag')}, **filters)
+        results = list(
+            leakage_col.find(filters, {'code': 0, 'detail': 0}).sort('datetime', 1).limit(args.get('limit')).skip(
+                args.get('limit') * (args.get('from') - 1)))
+        total = leakage_col.count(filters)
+        if total:
+            msg = '共 {} 条记录'.format(total)
+        else:
+            msg = '暂无数据'
+        data = {
+            'msg': msg,
+            'result': results,
+            'total': total
+        }
+        return jsonify(data)
+
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=str, help='')
+        parser.add_argument('project', type=str, help='')
+        parser.add_argument('ignore', type=bool, help='')
+        parser.add_argument('security', type=bool, default=10, help='')
+        parser.add_argument('desc', type=str, default=1, help='')
+        args = parser.parse_args()
+        desc = base64.b64encode(args.get('desc').encode(encoding='utf-8')).decode()
+
+        leakage_col.update({'_id': args.get('id')}, {'$set': {'security': int(
+            args.get('security')), 'ignore': int(args.get('ignore')), 'desc': desc}})
+        if not args.get('security'):
+            if not args.get('ignore'):
+                for leakage in leakage_col.find({'project': args.get('project')}):
+                    leakage_col.update({'_id': leakage['_id']}, {
+                        '$set': {'security': 0, 'ignore': 0, 'desc': desc}})
+        if args.get('security') and args.get('ignore'):
+            for leakage in leakage_col.find({'project': args.get('project')}):
+                leakage_col.update({'_id': leakage['_id']}, {
+                    '$set': {'security': 1, 'ignore': 1, 'desc': desc}})
+        return jsonify({'status': 200, 'msg': '处理成功', 'result': []})
+
+
+api.add_resource(Leakage, '/api/leakage')
+
+
+class Statistics(Resource):
+    def get(self):
         pipeline = [
-            {'$group': {'_id': '$tag', 'value': {'$sum': 0}}},
+            {'$match': {'security': 0}},
+            {'$group': {'_id': '$tag', 'value': {'$sum': 1}}},
         ]
+
         results = list(leakage_col.aggregate(pipeline))
-    return jsonify({'status': 200, 'result': results})
+        if not len(results):
+            pipeline = [
+                {'$group': {'_id': '$tag', 'value': {'$sum': 0}}},
+            ]
+            results = list(leakage_col.aggregate(pipeline))
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
 
 
-@app.route('/view/leakages/<filter_str>', methods=['GET'])
-def leakages(filter_str):
-    datas = []
-    if filter_str == 'all':
-        querys = list(query_col.find({}, {'keyword': 0}))
-        for query in querys:
-            results = list(leakage_col.find({'tag': query['tag'], 'security': 0}, {
-                           'code': 0, 'detail': 0}).sort('datetime', 1).limit(5))
-            if results:
-                query['results'] = results
-                datas.append(query)
-    elif filter_str == 'processing':
-        datas = []
-        querys = list(query_col.find({}))
-        for query in querys:
-            results = list(leakage_col.find({'tag': query['tag'], 'security': 0, 'desc': {
-                           '$exists': True}}, {'code': 0, 'detail': 0}).sort('datetime', 1))
-            query['results'] = results
-            datas.append(query)
-
-    elif filter_str == 'processed':
-        datas = []
-        querys = list(query_col.find({}))
-        for query in querys:
-            results = list(leakage_col.find({'tag': query['tag'], 'security': 1}, {
-                           'code': 0, 'detail': 0}).sort('datetime', 1).limit(5))
-            query['results'] = results
-            datas.append(query)
-    else:
-        datas = []
-        querys = list(query_col.find({'tag': filter_str}, {'keyword': 0}))
-        for query in querys:
-            results = list(leakage_col.find({'tag': query['tag']}, {
-                'code': 0, 'detail': 0}).sort('datetime', 1).sort('security', 1))
-            query['results'] = results
-            datas.append(query)
-    return jsonify({'status': {'status_code': 200}, 'result': datas})
+api.add_resource(Statistics, '/api/statistics')
 
 
-@app.route('/view/tag/<tag>')
-def tag_details(tag):
-    return render_template('index.html')
-
-
-@app.route('/view/leakage/<leakage_id>')
-def leakage_details(leakage_id):
-    results = leakage_col.find_one({'_id': leakage_id})
-    return render_template('detail.html', results=results)
-
-
-@app.route('/view/leakage/<leakage_id>/code')
+@app.route('/api/leakage/<leakage_id>/code')
 def leakage_code(leakage_id):
     results = list(leakage_col.find(
         {'_id': leakage_id}, {'_id': 0, 'code': 1}))
-    return jsonify({'status': {'status_code': 200}, 'result': results})
+    return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
 
 
-@app.route('/deal/leakage', methods=['POST'])
-def deal_leakage():
-    data = request.get_json()
-    desc = base64.b64encode(data['desc'].encode(encoding='utf-8')).decode()
-
-    leakage_col.update({'_id': data['id']}, {'$set': {'security': int(
-        data['security']), 'ignore': int(data['ignore']), 'desc': desc}})
-    if not data['security']:
-        if not data['ignore']:
-            for leakage in leakage_col.find({'project': data['project']}):
-                leakage_col.update({'_id': leakage['_id']}, {
-                    '$set': {'security': 0, 'ignore': 0, 'desc': desc}})
-    if data['security'] and data['ignore']:
-        for leakage in leakage_col.find({'project': data['project']}):
-            leakage_col.update({'_id': leakage['_id']}, {
-                '$set': {'security': 1, 'ignore': 1, 'desc': desc}})
-    return jsonify({'status': {'status_code': 200}, 'result': []})
+@app.route('/api/leakage/<leakage_id>/info')
+def leakage_info(leakage_id):
+    results = list(leakage_col.find(
+        {'_id': leakage_id}, {'_id': 0, 'code': 0}))
+    return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
 
 
-@app.route('/setting/blacklist', methods=['GET', 'POST', 'DELETE'])
-def set_blacklist():
-    if request.method == 'GET':
+class Blacklist(Resource):
+    def get(self):
         blacklists = list(blacklist_col.find({}, {'_id': 0}))
-        return jsonify({'status': {'status_code': 200}, 'result': blacklists})
-    else:
-        data = request.get_json()
-        keyword = data['keyword']
-    if request.method == 'DELETE':
-        blacklist_col.delete_many({'keyword': keyword})
-    if request.method == 'POST':
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': blacklists})
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, help='')
+        args = parser.parse_args()
+        keyword = args.get('keyword')
         keyword = keyword.strip().replace(' ', '')
         blacklist_col.save({'_id': md5(keyword), 'keyword': keyword})
+        blacklists = list(blacklist_col.find({}, {'_id': 0}))
 
-    return jsonify({'status': {'status_code': 200}, 'result': []})
+        return jsonify({'status': 200, 'msg': '添加成功', 'result': blacklists})
+
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, help='')
+        args = parser.parse_args()
+        blacklist_col.delete_many({'keyword': args.get('keyword')})
+        blacklists = list(blacklist_col.find({}, {'_id': 0}))
+
+        return jsonify({'status': 404, 'msg': '删除成功', 'result': blacklists})
 
 
-@app.route('/setting/notice', methods=['GET', 'POST', 'DELETE'])
-def set_notice():
-    if request.method == 'GET':
+api.add_resource(Blacklist, '/api/setting/blacklist')
+
+
+class Notice(Resource):
+    def get(self):
         notices = list(notice_col.find({}, {'_id': 0}))
-        return jsonify({'status': {'status_code': 200}, 'result': notices})
-    else:
-        data = request.get_json()
-        keyword = data['keyword']
-    if request.method == 'DELETE':
-        notice_col.delete_many({'keyword': keyword})
-    if request.method == 'POST':
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': notices})
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, help='')
+        args = parser.parse_args()
+        keyword = args.get('keyword')
         keyword = keyword.strip().replace(' ', '')
         notice_col.save({'_id': md5(keyword), 'keyword': keyword})
+        notices = list(notice_col.find({}, {'_id': 0}))
+        return jsonify({'status': 200, 'msg': '添加成功', 'result': notices})
 
-    return jsonify({'status': {'status_code': 200}, 'result': []})
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, help='')
+        args = parser.parse_args()
+        notice_col.delete_many({'keyword': args.get('keyword')})
+        notices = list(notice_col.find({}, {'_id': 0}))
+
+        return jsonify({'status': 404, 'msg': '删除成功', 'result': notices})
 
 
-@app.route('/setting/query', methods=['GET', 'POST', 'DELETE'])
-def set_query():
-    if request.method == 'POST':
-        query = request.get_json()
-        status_code = insert(query)
-        return jsonify({'status': {'status_code': status_code}, 'result': []})
-    elif request.method == 'DELETE':
-        query = request.get_json()
-        query_col.delete_many({'_id': query.get('_id')})
-        leakage_col.delete_many({'tag': query.get('tag')})
-        return jsonify({'status': {'status_code': 200}, 'result': []})
-    else:
+api.add_resource(Notice, '/api/setting/notice')
+
+
+class Query(Resource):
+    def get(self):
         querys = list(query_col.find({}))
-        return jsonify({'status': {'status_code': 200}, 'result': querys})
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': querys})
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, help='')
+        parser.add_argument('tag', type=str, help='')
+        args = parser.parse_args()
+        query = args
+        status_code = insert(query)
+        querys = list(query_col.find({}))
+        return jsonify({'status': status_code, 'msg': '添加成功', 'result': querys})
+
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('_id', type=str, help='')
+        parser.add_argument('tag', type=str, help='')
+        args = parser.parse_args()
+        query_col.delete_many({'_id': args.get('_id')})
+        leakage_col.delete_many({'tag': args.get('tag')})
+        querys = list(query_col.find({}))
+        return jsonify({'status': 404, 'msg': '删除成功', 'result': querys})
 
 
-@app.route('/setting/cron', methods=['GET', 'POST'])
-def set_cron():
-    if request.method == 'POST':
-        data = request.get_json()
-        write_cron(int(data['every']), int(data['page'] + 1))
-        return jsonify({'status': {'status_code': 200}, 'result': []})
-    else:
-        return jsonify({'status': {'status_code': 200}, 'result': read_cron()})
+api.add_resource(Query, '/api/setting/query')
 
 
-@app.route('/setting', methods=['GET'])
-def setting():
-    return render_template('setting.html')
+class Cron(Resource):
+    def get(self):
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': read_cron()})
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('every', type=int, help='')
+        parser.add_argument('page', type=int, help='')
+        args = parser.parse_args()
+        write_cron(args.get('every'), int(args.get('page') + 1))
+        return jsonify({'status': 200, 'msg': '修改成功', 'result': read_cron()})
+
+
+api.add_resource(Cron, '/api/setting/cron')
 
 
 def insert(query):
