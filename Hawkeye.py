@@ -42,6 +42,8 @@ notice_col = db.notice
 
 app = Flask(__name__)
 api = Api(app)
+
+
 # CORS(app)
 
 
@@ -73,6 +75,7 @@ class Leakage(Resource):
             msg = '暂无数据'
         data = {
             'msg': msg,
+            'status': 200,
             'result': results,
             'total': total
         }
@@ -83,8 +86,8 @@ class Leakage(Resource):
         parser.add_argument('id', type=str, help='')
         parser.add_argument('project', type=str, help='')
         parser.add_argument('ignore', type=bool, help='')
-        parser.add_argument('security', type=bool, default=10, help='')
-        parser.add_argument('desc', type=str, default=1, help='')
+        parser.add_argument('security', type=bool, help='')
+        parser.add_argument('desc', type=str, default='', help='')
         args = parser.parse_args()
         desc = base64.b64encode(args.get('desc').encode(encoding='utf-8')).decode()
 
@@ -99,7 +102,7 @@ class Leakage(Resource):
             for leakage in leakage_col.find({'project': args.get('project')}):
                 leakage_col.update({'_id': leakage['_id']}, {
                     '$set': {'security': 1, 'ignore': 1, 'desc': desc}})
-        return jsonify({'status': 200, 'msg': '处理成功', 'result': []})
+        return jsonify({'status': 201, 'msg': '处理成功', 'result': []})
 
 
 api.add_resource(Leakage, '/api/leakage')
@@ -152,7 +155,7 @@ class Blacklist(Resource):
         blacklist_col.save({'_id': md5(keyword), 'keyword': keyword})
         blacklists = list(blacklist_col.find({}, {'_id': 0}))
 
-        return jsonify({'status': 200, 'msg': '添加成功', 'result': blacklists})
+        return jsonify({'status': 201, 'msg': '添加成功', 'result': blacklists})
 
     def delete(self):
         parser = reqparse.RequestParser()
@@ -180,7 +183,7 @@ class Notice(Resource):
         keyword = keyword.strip().replace(' ', '')
         notice_col.save({'_id': md5(keyword), 'keyword': keyword})
         notices = list(notice_col.find({}, {'_id': 0}))
-        return jsonify({'status': 200, 'msg': '添加成功', 'result': notices})
+        return jsonify({'status': 201, 'msg': '添加成功', 'result': notices})
 
     def delete(self):
         parser = reqparse.RequestParser()
