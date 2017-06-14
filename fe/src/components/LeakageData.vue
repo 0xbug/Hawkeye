@@ -113,16 +113,13 @@
             }
           })
           .then((response) => {
-            this.$message({
-              message: response.data.msg,
-              type: 'success'
-            });
+            this.$message.success(response.data.msg);
             this.leakagesData = response.data.result;
             this.total = response.data.total;
 
           })
           .catch((error) => {
-            console.log(error);
+            this.$message.error(error.toString());
           });
       }
     }, filters: {

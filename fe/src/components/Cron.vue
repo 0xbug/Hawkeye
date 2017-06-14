@@ -57,17 +57,11 @@
       handleCronSet(){
         this.axios.put(this.GLOBAL.settingCron, this.cron)
           .then((response) => {
-            this.$message({
-              message: response.data.msg,
-              type: 'success'
-            });
-            this.fetchCron();
-          }
-        ).catch((error) => {
-          this.$message({
-            message: error,
-            type: 'error'
-          });
+              this.$message.success(response.data.msg);
+              this.fetchCron();
+            }
+          ).catch((error) => {
+          this.$message.error(error.toString());
         });
       },
       fetchCron: function () {
@@ -76,10 +70,7 @@
             this.cron = response.data.result;
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
           });
       }
 

@@ -94,27 +94,18 @@
             this.querys = response.data.result;
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
           });
       },
       handleDeleteQuery(index, row) {
         this.axios.delete(`${this.GLOBAL.settingQuery}?_id=${row._id}&tag=${row.tag}`)
           .then((response) => {
-            this.$message({
-              message: response.data.msg,
-              type: 'success'
-            });
+            this.$message.success(response.data.msg);
             this.dialogFormVisible = false;
             this.querys = response.data.result;
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
             this.dialogFormVisible = false
 
           });
@@ -123,19 +114,13 @@
       handleAddQuery(form) {
         this.axios.post(this.GLOBAL.settingQuery, form)
           .then((response) => {
-            this.$message({
-              message: response.data.msg,
-              type: 'success'
-            });
+            this.$message.success(response.data.msg);
             this.dialogFormVisible = false;
             this.querys = response.data.result;
 
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
             this.dialogFormVisible = false
 
           });

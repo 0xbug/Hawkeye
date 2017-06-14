@@ -76,16 +76,4 @@
     padding-top: 0;
     padding-bottom: 0;
   }
-
-  .input-new-tag {
-    margin-left: 10px;
-    margin-right: 10px;
-    width: 78px;
-    margin-top: 5px;
-    vertical-align: bottom
-  }
-
-  .input-new-tag .el-input__inner {
-    height: 24px
-  }
 </style>

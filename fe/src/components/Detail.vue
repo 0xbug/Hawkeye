@@ -88,7 +88,6 @@
       fetchInfoData() {
         this.axios.get(`${this.GLOBAL.leakage}/${this.$route.params.id}/info`)
           .then((response) => {
-
             this.leakageInfo = response.data.result[0];
             this.form.security = this.leakageInfo.security;
             this.form.project = this.leakageInfo.project;
@@ -98,10 +97,7 @@
             }
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
           });
       },
       fetchCodeData() {
@@ -111,10 +107,7 @@
 
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
           });
       },
       dealLeakage(form) {
@@ -128,10 +121,8 @@
             });
           })
           .catch((error) => {
-            this.$message({
-              message: error,
-              type: 'error'
-            });
+            this.$message.error(error.toString());
+
           });
       }
     },
@@ -148,9 +139,4 @@
 <style scoped>
   @import "https://assets-cdn.github.com/assets/frameworks-3b630179b3ba661bed136319970519c14eae34456b7cf575d1126c208cd61d0e.css";
   @import "https://assets-cdn.github.com/assets/github-adef29b21c28620124e601ee69f4b175d336f5fba00d9b75685d91beb2c6373d.css";
-
-  .breadcrumb {
-    margin-bottom: 10px;
-    margin-top: 10px;
-  }
 </style>
