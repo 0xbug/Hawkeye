@@ -7,7 +7,7 @@ import LeakageData from '@/components/LeakageData'
 Vue.use(Router);
 const routes = [
   {path: '/', component: LeakageData},
-  {path: '/view/tag/:tag', component: LeakageData},
+  {path: '/view/tag/:tag', name:'tag',component: LeakageData},
   {path: '/view/leakage/:id', component: Detail},
   {path: '/setting', component: Setting},
 ];

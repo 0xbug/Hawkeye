@@ -11,7 +11,7 @@
           <i class="el-icon-document"></i>概览
         </template>
         <el-menu-item :key="item._id" index="item._id" v-for="item in statistics">
-          <router-link :to="'/view/tag/'+item._id">
+          <router-link :to="{name: 'tag',params:{tag:item._id}}">
             {{item._id}}
             <el-badge :value=item.value></el-badge>
           </router-link>
