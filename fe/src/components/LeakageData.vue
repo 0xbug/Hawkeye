@@ -25,24 +25,23 @@
               </router-link>
             </el-button>
             <span class="float-right f6 text-gray">{{result.language}}</span>
-            <el-tag type="success">
+            <el-tag type="success" v-if="result.security">
               <i class="el-icon-time"></i>
               {{result.datetime | timeago}}
             </el-tag>
-
+         <el-tag type="danger" v-else="result.security==1">
+              <i class="el-icon-time"></i>
+              {{result.datetime | timeago}}
+            </el-tag>
             <el-tag type="gray">
               <router-link :to="'/view/tag/'+result.tag">
                 {{result.tag}}
               </router-link>
             </el-tag>
 
-            <el-tag type="success" v-if="result.security">
+            <el-tag type="primary">
               <a target="_blank" :href="'https://github.com/'+result.project">{{result.project}}</a>
             </el-tag>
-            <el-tag type="danger" v-else="result.security==1">
-              <a target="_blank" :href="'https://github.com/'+result.project">{{result.project}}</a>
-            </el-tag>
-
             <el-tag type="warning">
               <a target="_blank" :href="result.link">{{result.filename.split('/').pop()}}</a>
             </el-tag>
