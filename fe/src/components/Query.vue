@@ -34,21 +34,23 @@
       <el-table
         :data="querys"
         style="width: 100%"
-        :stripe="true"
         :border="true"
+        :stripe="true"
 
       >
         <el-table-column
-          prop="tag"
           label="名称"
-          fixed="left"
-          align="left"
         >
+          <template scope="scope">
+            <span style="margin-left: 10px">
+              <router-link :to="'/view/tag/'+scope.row.tag">
+                {{scope.row.tag}}
+              </router-link>
+            </span>
+          </template>
         </el-table-column>
         <el-table-column
           label="关键字"
-          fixed="right"
-          align="left"
         >
           <template scope="scope">
             <span style="margin-left: 10px"><a
@@ -58,10 +60,13 @@
           </template>
         </el-table-column>
         <el-table-column
-          fixed="right"
           label="操作"
-          width="100">
+        >
           <template scope="scope">
+            <el-button
+              size="small"
+              @click="handleEdit(scope.$index, scope.row)">编辑
+            </el-button>
             <el-button
               size="small"
               type="danger"
@@ -88,6 +93,10 @@
       }
     },
     methods: {
+      handleEdit(index, row) {
+        this.form = row;
+        this.dialogFormVisible = true;
+      },
       fetchQuery: function () {
         this.axios.get(this.GLOBAL.settingQuery)
           .then((response) => {

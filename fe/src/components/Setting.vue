@@ -47,15 +47,6 @@
     line-height: 36px;
   }
 
-  .setting-card {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .setting-card .el-card {
-    margin-bottom: 5px;
-  }
-
   .item {
     padding: 5px 0;
     margin-left: 10px;
@@ -66,14 +57,5 @@
     margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
-  }
-
-  .button-new-tag {
-    margin-top: 5px;
-    margin-left: 10px;
-    height: 24px;
-    line-height: 22px;
-    padding-top: 0;
-    padding-bottom: 0;
   }
 </style>

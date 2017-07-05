@@ -1,5 +1,11 @@
 <template>
   <div>
+    <el-card class="breadcrumb">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{path:`/view/tag/${filters.tag}`}"> {{filters.tag}}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </el-card>
     <el-card>
       <div slot="header">
         <el-radio-group v-model="filters.status" @change="handleFilter">
@@ -13,7 +19,8 @@
             正在处理
           </el-radio-button>
           <el-radio-button :label="{security: 1}">
-            <i class="el-icon-check"></i> 归档</el-radio-button>
+            <i class="el-icon-check"></i> 归档
+          </el-radio-button>
         </el-radio-group>
       </div>
       <el-row>
@@ -40,7 +47,7 @@
                 {{result.tag}}
               </router-link>
             </el-tag>
-  
+
             <el-tag type="primary">
               <a target="_blank" :href="'https://github.com/'+result.project">{{result.project}}</a>
             </el-tag>
@@ -50,14 +57,16 @@
             <el-tag type="gray" v-if="result.desc">
               {{result.desc | b64decode}}
             </el-tag>
-  
+
           </el-card>
         </el-col>
       </el-row>
       <div class="page" v-if="leakagesData">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="from" :page-sizes="[5,10, 20, 50]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper" :total="total">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="from"
+                       :page-sizes="[5,10, 20, 50]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
         </el-pagination>
-  
+
       </div>
       <div v-if="leakagesData.length===0">
         <el-row :gutter="20">
@@ -71,101 +80,98 @@
 </template>
 
 <script>
-import Timeago from 'timeago.js';
-import { Base64 } from 'js-base64';
+  import Timeago from 'timeago.js';
+  import {Base64} from 'js-base64';
 
-const timeagoInstance = new Timeago();
+  const timeagoInstance = new Timeago();
 
-export default {
-  data() {
-    return {
-      filters: { status: {}, tag: this.$route.params.tag || '' },
-      leakagesData: [],
-      total: 100,
-      limit: 10,
-      from: 1
-    }
-  }, methods: {
-    handleFilter() {
-      this.from = 1;
+  export default {
+    data() {
+      return {
+        filters: {status: {}, tag: this.$route.params.tag || ''},
+        leakagesData: [],
+        total: 10,
+        limit: 10,
+        from: 1
+      }
+    }, methods: {
+      handleFilter() {
+        this.from = 1;
+        this.fetchLeakagesData();
+
+      },
+      handleSizeChange(val) {
+        this.limit = val;
+        this.from = 1;
+        this.fetchLeakagesData();
+      },
+      handleCurrentChange(val) {
+        this.from = val;
+        this.fetchLeakagesData();
+      },
+      fetchLeakagesData() {
+        this.axios.get(this.GLOBAL.leakage,
+          {
+            params: {
+              status: this.filters.status,
+              tag: this.filters.tag,
+              limit: this.limit,
+              from: this.from,
+            }
+          })
+          .then((response) => {
+            this.$message.success(response.data.msg);
+            this.leakagesData = response.data.result;
+            this.total = response.data.total;
+
+          })
+          .catch((error) => {
+            this.$message.error(error.toString());
+          });
+      }
+    }, filters: {
+      timeago(val) {
+        return timeagoInstance.format(val, 'zh_CN')
+      },
+      b64decode(val) {
+        return Base64.decode(val)
+      },
+    },
+    mounted() {
       this.fetchLeakagesData();
+      this.$nextTick(function () {
 
-    },
-    handleSizeChange(val) {
-      this.limit = val;
-      this.from = 1;
-      this.fetchLeakagesData();
-    },
-    handleCurrentChange(val) {
-      this.from = val;
-      this.fetchLeakagesData();
-    },
-    fetchLeakagesData() {
-      this.axios.get(this.GLOBAL.leakage,
-        {
-          params: {
-            status: this.filters.status,
-            tag: this.filters.tag,
-            limit: this.limit,
-            from: this.from,
-          }
-        })
-        .then((response) => {
-          this.$message.success(response.data.msg);
-          this.leakagesData = response.data.result;
-          this.total = response.data.total;
-
-        })
-        .catch((error) => {
-          this.$message.error(error.toString());
-        });
-    }
-  }, filters: {
-    timeago(val) {
-      return timeagoInstance.format(val, 'zh_CN')
-    },
-    b64decode(val) {
-      return Base64.decode(val)
-    },
-    more(val) {
-      if (val.split('.').length > 4) {
-        return val.split('.').pop()
-      } else {
-        return val
+      });
+    }, watch: {
+      '$route'(to, from) {
+        this.filters.tag = to.params.tag || '';
+        this.fetchLeakagesData();
       }
     }
-  },
-  mounted() {
-    this.fetchLeakagesData();
-    this.$nextTick(function () {
-
-    });
-  }, watch: {
-    '$route'(to, from) {
-      this.filters.tag = to.params.tag || '';
-      this.fetchLeakagesData();
-    }
   }
-}
 </script>
 
 <style>
-.float-right {
-  padding-top: 0;
-  float: right !important;
-}
+  .breadcrumb {
+    margin-bottom: 5px;
+  }
 
-.text-gray {
-  color: #586069 !important;
-}
+  .float-right {
+    padding-top: 0;
+    float: right !important;
+  }
 
-.f6 {
-  font-size: 12px !important;
-}
+  .text-gray {
+    color: #586069 !important;
+  }
 
-.page {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  float: right;
-}
+  .f6 {
+    font-size: 12px !important;
+  }
+
+  .page {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    float: right;
+  }
 </style>

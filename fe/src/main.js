@@ -12,12 +12,11 @@ Vue.prototype.axios = axios;
 Vue.prototype.GLOBAL = global_;
 Vue.use(ElementUI);
 Vue.use(VueHighlightJS);
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   template: '<App/>',
-  components: { App }
-})
+  components: {App}
+});

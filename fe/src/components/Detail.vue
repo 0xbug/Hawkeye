@@ -1,6 +1,13 @@
 <template>
   <div>
-
+    <el-card class="breadcrumb">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{path:`/view/tag/${leakageInfo.tag}`}">{{leakageInfo.tag}}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{leakageInfo.project}}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{leakageInfo.filename}}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </el-card>
     <el-row :gutter="6">
       <el-col :xs="24" :sm="24" :md="16" :lg="16">
         <el-card>
