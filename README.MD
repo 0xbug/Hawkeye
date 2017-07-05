@@ -10,6 +10,10 @@
 
 > 监控github代码库，及时发现员工托管公司代码到GitHub行为并预警，降低代码泄露风险。
 
+## 截图
+
+![](http://oslm1psgf.bkt.clouddn.com/HawkeyeScreenshot.png)
+
 ## 特性
 
 - 邮箱告警通知
@@ -104,5 +108,4 @@ python Hawkeye.py
 ## 说明
 
 > 如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！
-
-> 或者您可以 ["follow"](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下，我会不断开源更多有关甲方安全的项目。
+或者您可以 ["follow"](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下
