@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, jsonify
 from pymongo import MongoClient
 from crontab import CronTab
 # from flask_cors import CORS, cross_origin
@@ -42,7 +42,6 @@ notice_col = db.notice
 
 app = Flask(__name__)
 api = Api(app)
-
 
 # CORS(app)
 
@@ -127,18 +126,22 @@ class Statistics(Resource):
 api.add_resource(Statistics, '/api/statistics')
 
 
-@app.route('/api/leakage/<leakage_id>/code')
-def leakage_code(leakage_id):
-    results = list(leakage_col.find(
-        {'_id': leakage_id}, {'_id': 0, 'code': 1}))
-    return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
+class LeakageCode(Resource):
+    def get(self, leakage_id):
+        results = list(leakage_col.find(
+            {'_id': leakage_id}, {'_id': 0, 'code': 1}))
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
 
 
-@app.route('/api/leakage/<leakage_id>/info')
-def leakage_info(leakage_id):
-    results = list(leakage_col.find(
-        {'_id': leakage_id}, {'_id': 0, 'code': 0}))
-    return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
+class LeakageInfo(Resource):
+    def get(self, leakage_id):
+        results = list(leakage_col.find(
+            {'_id': leakage_id}, {'_id': 0, 'code': 0}))
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
+
+
+api.add_resource(LeakageCode, '/api/leakage/<leakage_id>/code')
+api.add_resource(LeakageInfo, '/api/leakage/<leakage_id>/info')
 
 
 class Blacklist(Resource):
