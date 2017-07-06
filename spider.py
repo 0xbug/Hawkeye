@@ -146,7 +146,11 @@ def crawl(query):
                     try:
                         if int(get_conf('Notice', 'ENABLE')):
                             send_mail(
-                                '命中规则: {}\n文件地址: {}\n\n\n\n\n 代码： \n{}'.format(
+                                '''
+                                命中规则: {}\n
+                                文件地址: {}\n
+                                代码: \n{}
+                                '''.format(
                                     leakage['tag'], leakage['link'], code))
                         else:
                             pass
@@ -167,17 +171,17 @@ def send_mail(content):
     mail_user = get_conf('Notice', 'FROM')
     mail_pass = get_conf('Notice', 'PASSWORD')
     sender = get_conf('Notice', 'FROM')
-    message = MIMEText(content, 'plain', 'utf-8')
-    message['From'] = Header("GitHub 监控", 'utf-8')
-    message['To'] = Header(sender, 'utf-8')
-    subject = 'GitHub 监控'
-    message['Subject'] = Header(subject, 'utf-8')
+    message = MIMEText(content, _subtype='plain', _charset='utf-8')
+    message['From'] = Header('GitHub 监控<{}>'.format(mail_user), 'utf-8')
+    message['To'] = Header(','.join(receivers), 'utf-8')
+    message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
     try:
-        smtpObj = smtplib.SMTP()
-        smtpObj.connect(mail_host, 587)
-        smtpObj.login(mail_user, mail_pass)
-        smtpObj.sendmail(sender, ','.join(receivers), message.as_string())
+        smtp = smtplib.SMTP()
+        smtp.connect(mail_host, 587)
+        smtp.login(mail_user, mail_pass)
+        smtp.sendmail(sender, ','.join(receivers), message.as_string())
         print("邮件发送成功")
+        smtp.close()
     except smtplib.SMTPException:
         print("Error: 无法发送邮件")
 
