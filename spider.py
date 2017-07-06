@@ -186,10 +186,10 @@ def send_mail(content):
         print("Error: 无法发送邮件")
 
 
-def md5(message):
-    m2 = hashlib.md5()
-    m2.update(message.encode('utf-8'))
-    results = m2.hexdigest()
+def md5(data):
+    m = hashlib.md5()
+    m.update(data.encode('utf-8'))
+    results = m.hexdigest()
     return results
 
 
