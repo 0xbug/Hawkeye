@@ -296,8 +296,8 @@ def read_cron():
 def md5(data):
     m = hashlib.md5()
     m.update(data.encode('utf-8'))
-    results = m.hexdigest()
-    return results
+    result = m.hexdigest()
+    return result
 
 
 if __name__ == '__main__':
