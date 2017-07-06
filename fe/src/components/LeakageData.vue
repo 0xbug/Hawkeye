@@ -10,13 +10,14 @@
       <div slot="header">
         <el-radio-group v-model="filters.status" @change="handleFilter">
           <el-radio-button :label="{}">不限</el-radio-button>
-          <el-radio-button :label="{security: 0}">
+          <el-radio-button :label="{security: 0,desc: {
+                      $exists: false}}">
             <i class="el-icon-time"></i> 待处理
           </el-radio-button>
           <el-radio-button :label="{security: 0, desc: {
                       $exists: true}}">
             <i class="el-icon-star-on"></i>
-            正在处理
+            已处理
           </el-radio-button>
           <el-radio-button :label="{security: 1}">
             <i class="el-icon-check"></i> 归档
@@ -88,7 +89,13 @@
   export default {
     data() {
       return {
-        filters: {status: {}, tag: this.$route.params.tag || ''},
+        filters: {
+          status: {
+            security: 0, desc: {
+              $exists: false
+            }
+          }, tag: this.$route.params.tag || ''
+        },
         leakagesData: [],
         total: 10,
         limit: 10,
