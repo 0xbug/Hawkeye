@@ -42,10 +42,11 @@ git clone https://github.com/0xbug/Hawkeye.git --depth 1
 
 Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改测试)
 
-安装依赖
+安装依赖 (修改/usr/local/bin/python3 为你系统的Python 3 路径)
 
 ```bash
 cd Hawkeye
+pip install virtualenv
 virtualenv --python=/usr/local/bin/python3 venv
 source venv/bin/activate
 pip install -r deploy/requirements.txt
@@ -99,7 +100,7 @@ PASSWORD = 密码
 ```bash
 python Hawkeye.py
 ```
-然后访问 http://0.0.0.0:5000/ 进行关键词、告警、黑名单、定时任务配置。
+然后访问 http://0.0.0.0:5000/ 进行关键词、告警、黑名单、定时任务配置(初次运行需要点击确认按钮新建cron任务)。
 
 ## 部署
 
