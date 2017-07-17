@@ -268,8 +268,8 @@ def write_cron(time, page):
         cron_command = '{0}/venv/bin/python {0}/spider.py 1 {1}'.format(
             base_path, page)
         my_user_cron = CronTab(user=True)
-        if list(my_user_cron.find_command('Hawkeye')):
-            for cron in my_user_cron.find_command('Hawkeye'):
+        if list(my_user_cron.find_comment('Hawkeye')):
+            for cron in my_user_cron.find_comment('Hawkeye'):
                 cron.delete()
         job = my_user_cron.new(command=cron_command)
         job.setall('*/{} * * * *'.format(time))
@@ -283,10 +283,10 @@ def write_cron(time, page):
 
 def read_cron():
     user_cron = CronTab(user=True)
-    if list(user_cron.find_command('Hawkeye')):
-        page = int(list(user_cron.find_command('Hawkeye'))
+    if list(user_cron.find_comment('Hawkeye')):
+        page = int(list(user_cron.find_comment('Hawkeye'))
                    [0].command.split(' ')[-1]) - 1
-        every = int(str(list(user_cron.find_command('Hawkeye'))
+        every = int(str(list(user_cron.find_comment('Hawkeye'))
                         [0].minutes).replace('*/', ''))
         return {'every': every, 'page': page}
     else:
