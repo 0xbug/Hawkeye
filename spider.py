@@ -14,7 +14,9 @@ from pymongo import MongoClient
 from time import sleep
 import hashlib
 import sys
+import io
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 base_path = os.path.split(os.path.realpath(__file__))[0]
 conf_path = base_path + '/config.ini'
 
@@ -89,12 +91,10 @@ def crawl(query):
                 node_index = nodes.index(node) + 1
                 in_blacklist = False
                 leakage = {}
-                print('datetime')
                 leakage['datetime'] = node.xpath(
                     get_conf('Leakage', 'DATETIME').format(
                         node_index))[0].attrib['datetime']
                 print(leakage['datetime'])
-                print('link')
                 leakage['link'] = 'https://github.com{}'.format(
                     node.xpath(get_conf('Leakage', 'LINK').format(node_index))[
                         0].attrib['href'])
@@ -154,8 +154,8 @@ def crawl(query):
                                     leakage['tag'], leakage['link'], code))
                         else:
                             pass
-                    except BaseException:
-                        pass
+                    except BaseException as e:
+                        print(e)
             except Exception as e:
                 print(e)
         if 'next_page disabled' in resp.text:
