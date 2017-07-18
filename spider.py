@@ -168,6 +168,7 @@ def send_mail(content):
     for i in to_list:
         receivers.append(i['keyword'])
     mail_host = get_conf('Notice', 'MAIL_SERVER')
+    mail_port = int(get_conf('Notice', 'MAIL_PORT'))
     mail_user = get_conf('Notice', 'FROM')
     mail_pass = get_conf('Notice', 'PASSWORD')
     sender = get_conf('Notice', 'FROM')
@@ -177,7 +178,7 @@ def send_mail(content):
     message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
     try:
         smtp = smtplib.SMTP()
-        smtp.connect(mail_host, 587)
+        smtp.connect(mail_host, mail_port)
         smtp.login(mail_user, mail_pass)
         smtp.sendmail(sender, ','.join(receivers), message.as_string())
         print("邮件发送成功")

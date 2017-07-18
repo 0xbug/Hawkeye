@@ -91,6 +91,7 @@ PASSWORD = 密码
 [Notice]
 ENABLE = 1
 MAIL_SERVER = 邮件服务器
+MAIL_PORT = smtp端口
 FROM = 发件人
 PASSWORD = 密码
 ```
