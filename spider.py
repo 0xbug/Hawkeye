@@ -177,8 +177,7 @@ def send_mail(content):
     message['To'] = Header(','.join(receivers), 'utf-8')
     message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
     try:
-        smtp = smtplib.SMTP()
-        smtp.connect(mail_host, mail_port)
+        smtp = smtplib.SMTP(mail_host, mail_port)
         if mail_port == 587:
             smtp.starttls()
         smtp.login(mail_user, mail_pass)
