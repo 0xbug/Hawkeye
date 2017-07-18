@@ -124,11 +124,11 @@ def crawl(query):
                     if len(node.xpath('span')):
                         leakage['language'] = node.xpath(
                             'span')[0].text.strip()
-                    raw = 'https://raw.githubusercontent.com{}'.format(
+                    raw_link = 'https://raw.githubusercontent.com{}'.format(
                         node.xpath(get_conf('Leakage', 'RAW').format(node_index))[
                             0].attrib['href'].replace('/blob', ''))
-                    code = requests.get(raw).text
-
+                    code_resp = requests.get(raw_link)
+                    code = code_resp.text.encode(code_resp.encoding).decode('utf-8')
                     leakage['code'] = base64.b64encode(
                         code.encode(encoding='utf-8')).decode()
                     leakage['_id'] = md5(leakage['code'])
@@ -179,11 +179,14 @@ def send_mail(content):
     try:
         smtp = smtplib.SMTP()
         smtp.connect(mail_host, mail_port)
+        if mail_port == 587:
+            smtp.starttls()
         smtp.login(mail_user, mail_pass)
         smtp.sendmail(sender, ','.join(receivers), message.as_string())
-        print("邮件发送成功")
         smtp.close()
-    except smtplib.SMTPException:
+        print("邮件发送成功")
+    except smtplib.SMTPException as e:
+        print(e)
         print("Error: 无法发送邮件")
 
 
