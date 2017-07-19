@@ -84,6 +84,7 @@ celerybeat-schedule
 
 # config
 config.ini
+*.ini
 
 # virtualenv
 .venv
