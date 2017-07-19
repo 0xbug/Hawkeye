@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-import requests
+
 import configparser
-import re
 import base64
-from lxml import etree
-from pymongo import MongoClient
-from time import sleep
 import hashlib
 import sys
+import re
 import io
+import cgi
+import os
+import smtplib
+import requests
+
+from email.mime.text import MIMEText
+from email.header import Header
+from time import sleep
+
+from lxml import etree
+from pymongo import MongoClient
+
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 base_path = os.path.split(os.path.realpath(__file__))[0]
@@ -128,7 +133,8 @@ def crawl(query):
                         node.xpath(get_conf('Leakage', 'RAW').format(node_index))[
                             0].attrib['href'].replace('/blob', ''))
                     code_resp = requests.get(raw_link)
-                    code = code_resp.text.encode(code_resp.encoding).decode('utf-8')
+                    code = code_resp.text.encode(
+                        code_resp.encoding).decode('utf-8')
                     leakage['code'] = base64.b64encode(
                         code.encode(encoding='utf-8')).decode()
                     leakage['_id'] = md5(leakage['code'])
@@ -145,16 +151,21 @@ def crawl(query):
                     leakage_col.save(leakage)
                     try:
                         if int(get_conf('Notice', 'ENABLE')):
-                            send_mail(
-                                '''
-                                命中规则: {}\n
-                                文件地址: {}\n
-                                代码: \n{}
+                            email_content = '''
+                                <h3>命中规则:</h3> 
+                                <span>{}</span>
+                                 <br>
+                                <h3>文件地址:</h3>
+                                <span>{}</span>
+                                <br>
+                                <h3>代码:</h3>
+                                <pre><code style="background-color: #f6f8fa;white-space: pre;">{}</code></pre>
                                 '''.format(
-                                    leakage['tag'], leakage['link'], code))
+                                leakage['tag'], leakage['link'], cgi.escape(code))
+                            send_mail(email_content)
                         else:
                             pass
-                    except BaseException as e:
+                    except Exception as e:
                         print(e)
             except Exception as e:
                 print(e)
@@ -172,7 +183,7 @@ def send_mail(content):
     mail_user = get_conf('Notice', 'FROM')
     mail_pass = get_conf('Notice', 'PASSWORD')
     sender = get_conf('Notice', 'FROM')
-    message = MIMEText(content, _subtype='plain', _charset='utf-8')
+    message = MIMEText(content, _subtype='html', _charset='utf-8')
     message['From'] = Header('GitHub 监控<{}>'.format(mail_user), 'utf-8')
     message['To'] = Header(','.join(receivers), 'utf-8')
     message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
