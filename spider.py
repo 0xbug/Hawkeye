@@ -15,8 +15,6 @@ import requests
 
 from email.mime.text import MIMEText
 from email.header import Header
-from time import sleep
-
 from lxml import etree
 from pymongo import MongoClient
 
@@ -80,7 +78,6 @@ def crawl(query):
                 search_url.format(
                     page, query['keyword']))
         except BaseException:
-            sleep(30)
             resp = session.get(
                 search_url.format(
                     page, query['keyword']))
@@ -91,7 +88,6 @@ def crawl(query):
         tree = etree.HTML(resp.text)
         nodes = tree.xpath(get_conf('Leakage', 'NODES'))
         for node in nodes:
-            sleep(3)
             try:
                 node_index = nodes.index(node) + 1
                 in_blacklist = False
