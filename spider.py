@@ -115,13 +115,13 @@ def crawl(query):
                         in_blacklist = True
                         break
                 if in_blacklist:
-                    break
+                    continue
                 if leakage_col.find_one({"project": leakage['project'], "ignore": 1}):
-                    break
+                    continue
                 if leakage_col.find_one({"link": leakage['link'], "datetime": leakage['datetime']}):
-                    break
+                    continue
                 if leakage_col.find_one({'_id': leakage['_id']}):
-                    break
+                    continue
                 raw_link = 'https://raw.githubusercontent.com{}'.format(
                     node.xpath(get_conf('Leakage', 'RAW').format(node_index))[
                         0].attrib['href'].replace('/blob', ''))
