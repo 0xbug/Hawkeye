@@ -1,6 +1,6 @@
 # hawkeye
 
-> GitHub 泄露监控系统 Edit
+> github leakage scan
 
 ## Build Setup
 

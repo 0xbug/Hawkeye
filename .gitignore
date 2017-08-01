@@ -107,3 +107,4 @@ deploy/supervisor.conf
 deploy/Hawkeye.conf
 fe/node_modules
 .idea
+.vscode
