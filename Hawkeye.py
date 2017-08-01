@@ -84,11 +84,12 @@ class Leakage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, help='')
         parser.add_argument('project', type=str, help='')
-        parser.add_argument('ignore', type=bool, help='')
-        parser.add_argument('security', type=bool, help='')
+        parser.add_argument('ignore', type=int, choices=(0, 1), help='')
+        parser.add_argument('security', type=int, choices=(0, 1), help='')
         parser.add_argument('desc', type=str, default='', help='')
         args = parser.parse_args()
-        desc = base64.b64encode(args.get('desc').encode(encoding='utf-8')).decode()
+        desc = base64.b64encode(
+            args.get('desc').encode(encoding='utf-8')).decode()
 
         leakage_col.update({'_id': args.get('id')}, {'$set': {'security': int(
             args.get('security')), 'ignore': int(args.get('ignore')), 'desc': desc}})
