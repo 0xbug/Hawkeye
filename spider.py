@@ -107,6 +107,7 @@ def crawl(query):
                 leakage['project'] = node.xpath(
                     get_conf('Leakage', 'PROJECT').format(node_index))[0].text
                 print('project')
+                leakage['_id'] = md5(leakage['link'])
                 for blacklist in blacklist_col.find({}):
                     print(blacklist['keyword'])
                     print('\n' in blacklist['keyword'])
@@ -114,43 +115,44 @@ def crawl(query):
                         in_blacklist = True
                         break
                 if in_blacklist:
-                    pass
-                elif leakage_col.find_one({"project": leakage['project'], "ignore": 1}):
-                    pass
-                elif leakage_col.find_one({"link": leakage['link'], "datetime": leakage['datetime']}):
-                    pass
-                else:
-                    leakage['username'] = node.xpath(
-                        get_conf(
-                            'Leakage',
-                            'USERNAME').format(node_index))[0].attrib['href'].replace(
-                        '/',
-                        '')
-                    if len(node.xpath('span')):
+                    break
+                if leakage_col.find_one({"project": leakage['project'], "ignore": 1}):
+                    break
+                if leakage_col.find_one({"link": leakage['link'], "datetime": leakage['datetime']}):
+                    break
+                if leakage_col.find_one({'_id': leakage['_id']}):
+                    break
+                raw_link = 'https://raw.githubusercontent.com{}'.format(
+                    node.xpath(get_conf('Leakage', 'RAW').format(node_index))[
+                        0].attrib['href'].replace('/blob', ''))
+                code_resp = requests.get(raw_link)
+                code = code_resp.text.encode(
+                    code_resp.encoding).decode('utf-8')
+                leakage['code'] = base64.b64encode(
+                    code.encode(encoding='utf-8')).decode()
+                leakage['username'] = node.xpath(
+                    get_conf(
+                        'Leakage',
+                        'USERNAME').format(node_index))[0].attrib['href'].replace(
+                    '/',
+                    '')
+                if len(node.xpath('span')):
                         leakage['language'] = node.xpath(
                             'span')[0].text.strip()
-                    raw_link = 'https://raw.githubusercontent.com{}'.format(
-                        node.xpath(get_conf('Leakage', 'RAW').format(node_index))[
-                            0].attrib['href'].replace('/blob', ''))
-                    code_resp = requests.get(raw_link)
-                    code = code_resp.text.encode(
-                        code_resp.encoding).decode('utf-8')
-                    leakage['code'] = base64.b64encode(
-                        code.encode(encoding='utf-8')).decode()
-                    leakage['_id'] = md5(leakage['code'])
-                    leakage['filename'] = node.xpath(
-                        get_conf('Leakage', 'FILENAME').format(node_index))[0].attrib[
-                        'title']
-                    leakage['tag'] = query['tag']
-                    leakage['detail'] = etree.tostring(
-                        node, pretty_print=True, encoding='unicode').replace('{{', '<<').replace('}}', '>>').replace(
-                        'href="/' + leakage['project'],
+
+                leakage['filename'] = node.xpath(
+                    get_conf('Leakage', 'FILENAME').format(node_index))[0].attrib[
+                    'title']
+                leakage['tag'] = query['tag']
+                leakage['detail'] = etree.tostring(
+                    node, pretty_print=True, encoding='unicode').replace('{{', '<<').replace('}}', '>>').replace(
+                    'href="/' + leakage['project'],
                         'target="_blank" href="https://github.com/' + leakage['project'])
-                    leakage['security'] = 0
-                    leakage['ignore'] = 0
-                    leakage_col.save(leakage)
-                    try:
-                        if int(get_conf('Notice', 'ENABLE')):
+                leakage['security'] = 0
+                leakage['ignore'] = 0
+                leakage_col.save(leakage)
+                try:
+                    if int(get_conf('Notice', 'ENABLE')):
                             email_content = '''
                                 <h3>命中规则:</h3> 
                                 <span>{}</span>
@@ -163,10 +165,10 @@ def crawl(query):
                                 '''.format(
                                 leakage['tag'], leakage['link'], cgi.escape(code))
                             send_mail(email_content)
-                        else:
-                            pass
-                    except Exception as e:
-                        print(e)
+                    else:
+                        pass
+                except Exception as e:
+                    print(e)
             except Exception as e:
                 print(e)
         if 'next_page disabled' in resp.text:
