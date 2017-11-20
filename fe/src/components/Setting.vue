@@ -1,5 +1,8 @@
 <template>
-  <el-tabs active-name="query">
+  <el-tabs 
+  type="border-card"
+  tab-position="left"
+  active-name="query">
     <el-tab-pane name="query">
       <span slot="label"><i class="el-icon-edit"></i> 关键词配置</span>
       <Query></Query>

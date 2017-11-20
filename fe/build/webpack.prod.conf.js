@@ -13,10 +13,38 @@ var env = config.build.env
 
 var webpackConfig = merge(baseWebpackConfig, {
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
-      extract: true
-    })
+    loaders: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
+        loader: 'file-loader'
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
+        loader: 'file-loader',
+        query: {
+          name: '[name].[ext]?[hash]'
+        }
+      }
+    ], rules: [
+      {test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/},
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+      },
+    ]
   },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {

@@ -7,12 +7,14 @@ import axios from 'axios';
 import global_ from '@/commons/Global';
 import VueHighlightJS from 'vue-highlight.js';
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
-Vue.prototype.axios = axios;
-Vue.prototype.GLOBAL = global_;
+import 'element-ui/lib/theme-chalk/index.css'
+
 Vue.use(ElementUI);
 Vue.use(VueHighlightJS);
 Vue.config.productionTip = false;
+Vue.prototype.$ELEMENT = { size: 'small' }
+Vue.prototype.axios = axios;
+Vue.prototype.GLOBAL = global_;
 
 new Vue({
   el: '#app',

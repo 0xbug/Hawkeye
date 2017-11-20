@@ -10,7 +10,7 @@
 
 <script>
   import NavMenu from '@/components/NavMenu';
-
+  
   export default {
     name: 'app',
     components: {
@@ -20,7 +20,6 @@
 </script>
 
 <style>
-
   .content .el-card {
     margin-left: 5px;
     margin-right: 5px;
@@ -32,15 +31,19 @@
     overflow: hidden;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
   }
-
+  
   .el-card .el-card__header {
     padding: 10px 10px;
   }
-
+  
   .el-card .el-card__body {
     padding: 10px;
   }
-
+  
+  .el-menu {
+    border-radius: 0 !important;
+  }
+  
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 14px;
@@ -48,10 +51,10 @@
     color: #24292e;
     background-color: #fff;
   }
-
-  body a {
+  
+  a {
     color: #0366d6;
-    text-decoration: none;
+    text-decoration: none !important;
     background-color: transparent;
   }
 </style>
