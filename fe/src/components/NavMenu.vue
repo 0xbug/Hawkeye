@@ -1,9 +1,7 @@
 <template>
   <div class="navigation">
     <el-menu 
-    background-color="rgb(45, 47, 53)" 
-    text-color="#fff"
-    active-text-color="#0366d6"
+    theme="dark"
     :default-active="activeIndex" mode="horizontal">
       <el-menu-item index="1">
         <router-link to="/">
