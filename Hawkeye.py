@@ -65,7 +65,7 @@ class Leakage(Resource):
         if args.get('tag'):
             filters = dict({'tag': args.get('tag')}, **filters)
         results = list(
-            leakage_col.find(filters, {'code': 0, 'detail': 0}).sort('datetime', 1).limit(args.get('limit')).skip(
+            leakage_col.find(filters, {'code': 0, 'detail': 0}).sort('datetime', -1).limit(args.get('limit')).skip(
                 args.get('limit') * (args.get('from') - 1)))
         total = leakage_col.count(filters)
         if total:
