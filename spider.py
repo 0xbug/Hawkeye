@@ -56,7 +56,7 @@ def create_session():
     session = requests.session()
     login_page_resp = session.get('https://github.com/login').text
     authenticity_token = re.findall(
-        'name="authenticity_token" type="hidden" value="(.*?)" />',
+        'name="authenticity_token".*?value="(.*?)" />',
         login_page_resp)[0]
     post_form = {
         'commit': 'Sign in',
