@@ -1,5 +1,7 @@
 # Hawkeye
 
+>2018.03.14 由于 `spider.py` 中一处正则匹配问题，导致近日开始登录失败，请大家 pull 下新代码
+
 [![GitHub issues](https://img.shields.io/github/issues/0xbug/Hawkeye.svg)](https://github.com/0xbug/Hawkeye/issues)
 [![GitHub forks](https://img.shields.io/github/forks/0xbug/Hawkeye.svg)](https://github.com/0xbug/Hawkeye/network)
 [![GitHub stars](https://img.shields.io/github/stars/0xbug/Hawkeye.svg)](https://github.com/0xbug/Hawkeye/stargazers)
