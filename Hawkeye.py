@@ -3,11 +3,13 @@
 from flask import Flask, render_template, jsonify
 from pymongo import MongoClient
 from crontab import CronTab
-# from flask_cors import CORS, cross_origin
+# from flask_cors import CORS
 from flask_restful import Resource, Api, reqparse
+
 import configparser
 import json
 import os
+import re
 import hashlib
 import base64
 
@@ -32,7 +34,7 @@ try:
     db = cli.Hawkeye
     db.authenticate(get_conf('MongoDB', 'ACCOUNT'),
                     get_conf('MongoDB', 'PASSWORD'))
-except BaseException:
+except Exception as error:
     db = cli.Hawkeye
 
 leakage_col = db.leakage
@@ -42,8 +44,16 @@ notice_col = db.notice
 
 app = Flask(__name__)
 api = Api(app)
-
 # CORS(app)
+
+if int(get_conf('Auth', 'ENABLE')):
+    if get_conf('Auth', 'TYPE') == 'basic':
+        from flask_basicauth import BasicAuth
+
+        app.config['BASIC_AUTH_USERNAME'] = get_conf('Auth', 'USERNAME')
+        app.config['BASIC_AUTH_PASSWORD'] = get_conf('Auth', 'PASSWORD')
+        app.config['BASIC_AUTH_FORCE'] = True
+        basic_auth = BasicAuth(app)
 
 
 @app.route('/')
@@ -56,6 +66,7 @@ class Leakage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('status', type=str, help='')
         parser.add_argument('tag', type=str, help='')
+        parser.add_argument('language', type=str, help='')
         parser.add_argument('limit', type=int, default=10, help='')
         parser.add_argument('from', type=int, default=1, help='')
         args = parser.parse_args()
@@ -64,8 +75,10 @@ class Leakage(Resource):
 
         if args.get('tag'):
             filters = dict({'tag': args.get('tag')}, **filters)
+        if args.get('language'):
+            filters = dict({'language': args.get('language')}, **filters)
         results = list(
-            leakage_col.find(filters, {'code': 0, 'detail': 0}).sort('datetime', -1).limit(args.get('limit')).skip(
+            leakage_col.find(filters, {'code': 0, 'filename': 0}).sort('datetime', -1).limit(args.get('limit')).skip(
                 args.get('limit') * (args.get('from') - 1)))
         total = leakage_col.count(filters)
         if total:
@@ -110,15 +123,25 @@ api.add_resource(Leakage, '/api/leakage')
 
 class Statistics(Resource):
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('by', type=str, default='tag', help='')
+        parser.add_argument('tag', type=str, help='')
+        args = parser.parse_args()
+        by = args.get('by')
+        tag = args.get('tag')
+        if len(tag):
+            filters = {'tag': tag, 'security': 0}
+        else:
+            filters = {'security': 0}
         pipeline = [
-            {'$match': {'security': 0}},
-            {'$group': {'_id': '$tag', 'value': {'$sum': 1}}},
+            {'$match': filters},
+            {'$group': {'_id': '${}'.format(by), 'value': {'$sum': 1}}},
         ]
 
         results = list(leakage_col.aggregate(pipeline))
         if not len(results):
             pipeline = [
-                {'$group': {'_id': '$tag', 'value': {'$sum': 0}}},
+                {'$group': {'_id': '${}'.format(by), 'value': {'$sum': 0}}},
             ]
             results = list(leakage_col.aggregate(pipeline))
         return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
@@ -131,7 +154,26 @@ class LeakageCode(Resource):
     def get(self, leakage_id):
         results = list(leakage_col.find(
             {'_id': leakage_id}, {'_id': 0, 'code': 1}))
-        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results})
+        affect_assets = get_affect_assets(
+            base64.b64decode(results[0].get("code").encode(encoding='utf-8'), validate=True))
+        return jsonify({'status': 200, 'msg': '获取信息成功', 'result': results, 'affect': affect_assets})
+
+
+def get_affect_assets(code):
+    code = str(code)
+    affect = []
+    domain_pattern = '(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}'
+    ip_pattern = "(\d+\.\d+\.\d+\.\d+)"
+    email_pattern = "[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?"
+    affect_assets = {
+        # 'domain': list(set(re.findall(domain_pattern, code))),
+        'email': list(set(re.findall(email_pattern, code))),
+        'ip': list(set(re.findall(ip_pattern, code))),
+    }
+    for assets in affect_assets.keys():
+        for asset in affect_assets.get(assets):
+            affect.append({'type': assets, 'value': asset.replace("'", "").replace('"', '').replace("`", "")})
+    return affect
 
 
 class LeakageInfo(Resource):
@@ -204,18 +246,19 @@ api.add_resource(Notice, '/api/setting/notice')
 
 class Query(Resource):
     def get(self):
-        querys = list(query_col.find({}))
+        querys = list(query_col.find({}).sort('enabled', -1))
         return jsonify({'status': 200, 'msg': '获取信息成功', 'result': querys})
 
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('keyword', type=str, help='')
         parser.add_argument('tag', type=str, help='')
+        parser.add_argument('enabled', type=bool, default=True, help='')
         args = parser.parse_args()
         query = args
         status_code = insert(query)
-        querys = list(query_col.find({}))
-        return jsonify({'status': status_code, 'msg': '添加成功', 'result': querys})
+        querys = list(query_col.find({}).sort('enabled', -1))
+        return jsonify({'status': status_code, 'msg': '添加/更新成功', 'result': querys})
 
     def delete(self):
         parser = reqparse.RequestParser()
@@ -248,15 +291,15 @@ api.add_resource(Cron, '/api/setting/cron')
 
 
 def insert(query):
-    if set(query.keys()) != {'tag', 'keyword'}:
+    if set(query.keys()) != {'tag', 'keyword', 'enabled'}:
         return 422
     elif not query_col.find_one({'tag': query.get('tag')}):
-        query['_id'] = md5(''.join(query.values()))
+        query['_id'] = md5(''.join([str(v) for v in query.values()]))
         query_col.save(query)
         return 201
     elif query_col.find_one({'tag': query.get('tag')}):
         query_col.delete_many({'tag': query.get('tag')})
-        query['_id'] = md5(''.join(query.values()))
+        query['_id'] = md5(''.join([str(v) for v in query.values()]))
         query_col.save(query)
         return 201
     else:
@@ -265,7 +308,6 @@ def insert(query):
 
 def write_cron(time, page):
     if isinstance(time, int):
-        base_path = os.path.split(os.path.realpath(__file__))[0]
         cron_command = '{0}/venv/bin/python {0}/spider.py 1 {1}'.format(
             base_path, page)
         my_user_cron = CronTab(user=True)
@@ -302,4 +344,4 @@ def md5(data):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True)
+    app.run(host='0.0.0.0', threaded=True, use_reloader=True)

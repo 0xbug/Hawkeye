@@ -5,6 +5,7 @@ chardet==3.0.3
 click==6.7
 configparser==3.5.0
 Flask==0.12.2
+Flask-BasicAuth==0.2.0
 Flask-Cors==3.0.2
 Flask-RESTful==0.3.6
 gunicorn==19.7.1

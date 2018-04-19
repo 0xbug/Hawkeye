@@ -1,3 +1,9 @@
+[Auth]
+ENABLE = 1
+TYPE = basic
+USERNAME =
+PASSWORD =
+
 [GitHub]
 USERNAME =
 PASSWORD =

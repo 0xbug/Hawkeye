@@ -104,6 +104,9 @@ ENV/
 .mypy_cache/
 deploy/supervisor.conf
 deploy/Hawkeye.conf
-fe/node_modules
+client/node_modules
 .idea
 .vscode
+.DS_Store
+
+logs

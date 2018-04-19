@@ -12,10 +12,25 @@
 
 ## 截图
 
-![](http://oslm1psgf.bkt.clouddn.com/HawkeyeScreenshot.png)
+![Hawkeye](https://user-images.githubusercontent.com/12611275/38987328-db9736d6-4401-11e8-9299-b5d1bb9c6b2e.png)
+
+## **最近更新**
+
+- 2018-04-19 v2.0.0
+    - 添加Basic 认证, 必须按照新的 `config.ini.example` 重新进行相关配置 
+    - 用户体验优化,支持多种过滤方式
+    - 爬虫任务状态、结果记录展示
+    - 解析受影响资产
+    - 添加开关，控制是否抓取
+    - 邮件 告警聚合
+- 2018.03.14 
+    - 由于 spider.py 中一处正则匹配问题，导致近日开始登录失败，请大家 pull 下新代码
+
 
 ## 特性
 
+- 周期监测
+- web管理
 - 邮箱告警通知
 - 黑名单添加
 - 爬虫任务设置
@@ -63,6 +78,16 @@ vim config.ini
 
 ### 需要修改的配置
 
+- 平台认证配置(BasicAuth)
+```conf
+[Auth]
+ENABLE = 1 或者 0 #是否开启认证功能
+TYPE = basic #(暂时只支持basic认证)
+USERNAME = 帐号
+PASSWORD = 密码
+```
+
+
 - `github` 帐户配置
 ```conf
 [GitHub]
@@ -109,5 +134,5 @@ python Hawkeye.py
 
 ## 说明
 
-> 如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！
-或者您可以 ["follow"](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下
+> 如果对您有帮助，您可以点右上角 Star 支持一下 谢谢！
+或者您可以 [follow](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下
