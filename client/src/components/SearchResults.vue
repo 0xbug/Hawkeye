@@ -12,13 +12,13 @@
 
           </div>
 
-          <el-tag size="small">
-            <router-link :to="'/view/tag/'+result.tag" target="_blank">
+          <el-tag disable-transitions size="small">
+            <router-link  :to="'/view/tag/'+result.tag" target="_blank">
               {{result.tag}}
             </router-link>
 
           </el-tag>
-          <el-tag type="danger" size="small" v-if="result.desc">
+          <el-tag disable-transitions	type="danger" size="small" v-if="result.desc">
             {{result.desc|b64decode}}
           </el-tag>
           <el-button-group>

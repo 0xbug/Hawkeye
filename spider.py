@@ -260,7 +260,7 @@ def md5(data):
 
 
 if __name__ == '__main__':
-    for query in query_col.find({'enabled': True})[::]:
+    for query in query_col.find({'enabled': True}).sort('status', 1):
         try:
             crawl(query)
         except Exception as error:

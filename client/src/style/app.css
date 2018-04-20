@@ -125,9 +125,10 @@ a {
 }
 
 .el-menu-item.is-disabled {
-  opacity: .65 !important;
+  opacity: .95 !important;
   color: #F56C6C !important;
   cursor: pointer !important;
+  margin-right: 20px;
 }
 
 .el-menu-item:hover {
@@ -167,4 +168,12 @@ a {
 
 .hljs {
   background-color: #fff !important;
+}
+
+#codelist img {
+  /*border-radius: 40px!important;*/
+}
+
+#codelist span.text-small.text-gray.match-count.mr-2{
+  display: none;
 }

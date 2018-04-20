@@ -1,5 +1,5 @@
 <template>
-  <div class="leakage-data">
+  <div>
     <el-row :gutter="8">
       <el-col :md="24" :lg="24">
         <el-card shadow="never">
@@ -56,7 +56,7 @@
 
             </div>
           </div>
-          <Searchresults :results="leakagesData"></Searchresults>
+          <SearchResults :results="leakagesData"></SearchResults>
           <div class="page" v-if="leakagesData">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
                            :current-page="from" :page-sizes="[20, 50,100]" :page-size="limit"
@@ -79,8 +79,7 @@
   } from 'js-base64';
 
   const timeagoInstance = new Timeago();
-  const Searchresults = () => import("./Searchresults");
-  const StatusCard = () => import("./StatusCard");
+  const SearchResults = () => import("./SearchResults");
 
   export default {
     data() {
@@ -159,7 +158,7 @@
         ;
       }
     },
-    components: {Searchresults, StatusCard},
+    components: {SearchResults},
     filters: {
       timeago(val) {
         return timeagoInstance.format(val, 'zh_CN')
@@ -225,10 +224,6 @@
   .tag-count {
     float: right;
     color: #313440;
-  }
-
-  .leakage-data {
-    margin-top: 20px;
   }
 
   .page-top {
