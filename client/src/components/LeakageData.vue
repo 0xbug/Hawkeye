@@ -49,7 +49,9 @@
               </el-radio-button>
             </el-radio-group>
             <div class="page-top" v-if="leakagesData">
-              <el-pagination small @size-change="handleSizeChange" @current-change="handleCurrentChange"
+              <el-pagination small
+                             :pager-count="5"
+                             @size-change="handleSizeChange" @current-change="handleCurrentChange"
                              :current-page="from" :page-sizes="[20, 50,100]" :page-size="limit"
                              layout="total,prev, pager, next, sizes" :total="total">
               </el-pagination>

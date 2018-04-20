@@ -13,37 +13,26 @@
           </div>
 
           <el-tag disable-transitions size="small">
-            <router-link  :to="'/view/tag/'+result.tag" target="_blank">
+            <router-link :to="'/view/tag/'+result.tag" target="_blank">
               {{result.tag}}
             </router-link>
 
           </el-tag>
-          <el-tag disable-transitions	type="danger" size="small" v-if="result.desc">
+          <el-tag disable-transitions type="danger" size="small" v-if="result.desc">
             {{result.desc|b64decode}}
           </el-tag>
           <el-button-group>
-            <el-button round size="small">
-              <router-link :to="'/view/leakage/'+result._id" target="_blank">
-                详情
-              </router-link>
+
+            <el-button round size="small" v-on:click="handleOpen('/#/view/leakage/'+result._id)">
+              详情
             </el-button>
-             <el-button round size="small">
-              <a
-                :href="'https://github.com/'+result.project+'/commits'"
-                target="_blank"
-                referrerpolicy="no-referrer"
-              >
-                Commits
-              </a>
+
+            <el-button round size="small" v-on:click="handleOpen('https://github.com/'+result.project+'/commits')">
+              Commits
             </el-button>
-            <el-button round size="small">
-              <a
-                :href="'https://github.com/'+result.project+'/search?utf8=✓&q=pass OR password OR passwd OR pwd OR smtp OR database'"
-                target="_blank"
-                referrerpolicy="no-referrer"
-              >
-                GitHub <i class="el-icon-search"></i>
-              </a>
+            <el-button round size="small"
+                       v-on:click="handleOpen('https://github.com/'+result.project+'/search?utf8=✓&q=pass OR password OR passwd OR pwd OR smtp OR database')">
+              GitHub <i class="el-icon-search"></i>
             </el-button>
           </el-button-group>
         </el-card>
@@ -71,7 +60,11 @@
       b64decode(val) {
         return Base64.decode(val)
       },
-    },
+    }, methods: {
+      handleOpen(href) {
+        window.open(href, "_blank")
+      },
+    }
   }
 </script>
 
