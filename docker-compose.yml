@@ -7,6 +7,8 @@ services:
     restart: always
     environment:
       - MONGODB_ROOT_PASSWORD=password
+      - MONGODB_USERNAME=hawkeye
+      - MONGODB_PASSWORD=password123
       - MONGODB_DATABASE=Hawkeye
     volumes:
       - mongodb:/bitnami
