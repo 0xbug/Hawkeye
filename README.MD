@@ -130,7 +130,19 @@ python Hawkeye.py
 
 ## 部署
 
-建议使用 `supervisor` 设置成开机自启，并监控进程，配置文件 `deploy/Hawkeye.conf.example`
+1. 使用 `supervisor` 设置成开机自启，并监控进程，配置文件 `deploy/Hawkeye.conf.example`
+
+2. docker 部署
+
+    修改config.ini.example
+
+    增加github配置，告警配置，和平台认证配置后
+
+    使用命令
+
+        docker-compose up （前台）
+        docker-compose up -d （后台）
+
 
 ## 说明
 

@@ -1,5 +1,5 @@
 [Auth]
-ENABLE = 1
+ENABLE = 0
 TYPE = basic
 USERNAME =
 PASSWORD =
@@ -10,10 +10,10 @@ PASSWORD =
 ERROR = We could not perform this search
 
 [MongoDB]
-HOST = localhost
+HOST = mongodb
 PORT = 27017
-ACCOUNT = 
-PASSWORD = 
+ACCOUNT = root
+PASSWORD = password
 
 [Leakage]
 NODES = //*[@id="code_search_results"]/div/div[*]

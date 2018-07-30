@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  mongodb:
+    container_name: hawkeye_mongodb
+    image: 'bitnami/mongodb:latest'
+    restart: always
+    environment:
+      - MONGODB_ROOT_PASSWORD=password
+      - MONGODB_USERNAME=hawkeye
+      - MONGODB_PASSWORD=password123
+      - MONGODB_DATABASE=Hawkeye
+    volumes:
+      - mongodb:/bitnami
+
+  hawkeye:
+    container_name: hawkeye_web
+    build: .
+    restart: always
+    command:
+      - /bin/sh
+      - -c
+      - |
+        python Hawkeye.py
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+
+volumes:
+  mongodb:
