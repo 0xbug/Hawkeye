@@ -135,19 +135,20 @@ python Hawkeye.py
 
 ## Docker化部署模式
 - 首先确保您服务器中已经安装docker（我们推荐最新的稳定版本）
-- 修改配置文件并配置为您希望的模式（如上文）
-```
-cp config.ini.example config.ini
-```
+
 - 构建docker image（为了不入侵服务，暂时没有做成通过环境变量传参修改配置文件的模式，故每个环境需要单独build image）
 ```
 假定镜像名字为test/testhawkeye:v0.0.1
 
 docker build -t test/testhawkeye:v0.0.1 .
 ```
+- 修改配置文件并配置为您希望的模式（如上文）
+```
+cp config.ini.example config.ini
+```
 - 运行docker(将容器内5000端口映射至宿主机5000端口)
 ```
-docker run -dit -p 5000:5000 --name hawkeye test/testhawkeye:v0.0.1 
+docker run -dit -p 5000:5000 -v /{$your_path}/config.ini:/app/Hawkeye/config.ini --name hawkeye test/testhawkeye:v0.0.1 
 ```
 
 - 进入容器（如果需要）
