@@ -3,7 +3,7 @@ MAINTAINER eshujiushiwo <liyang@teambition.com>
 
 # application folder
 ENV APP_DIR /app/Hawkeye
-ADD ./ /app/Hawkeye
+COPY ./ /app/Hawkeye
 
 WORKDIR ${APP_DIR}
 
