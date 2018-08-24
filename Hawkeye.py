@@ -12,6 +12,11 @@ import os
 import re
 import hashlib
 import base64
+import sys
+
+# fix python>3.7 re broker
+if sys.hexversion > 0x03070000:
+    re._pattern_type = re.Pattern
 
 base_path = os.path.split(os.path.realpath(__file__))[0]
 conf_path = base_path + '/config.ini'
