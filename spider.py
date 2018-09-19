@@ -244,7 +244,7 @@ def send_mail(content):
         if mail_port == 587:
             smtp.starttls()
         smtp.login(mail_user, mail_pass)
-        smtp.sendmail(sender, ','.join(receivers), message.as_string())
+        smtp.sendmail(sender, receivers, message.as_string())
         smtp.close()
         logger.info('邮件发送成功')
 
