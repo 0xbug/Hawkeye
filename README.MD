@@ -12,8 +12,7 @@
 
 ## 截图
 
-![Hawkeye](https://user-images.githubusercontent.com/12611275/38987328-db9736d6-4401-11e8-9299-b5d1bb9c6b2e.png)
-
+![Hawkeye](https://user-images.githubusercontent.com/12611275/46849889-0d2d0980-ce24-11e8-832e-35f6f935bf3b.png)
 ## **最近更新**
 - 2018-10-12 v3.0.0
     - 搜索方式切换成API，支持添加多GitHub用户，API配额可视化
