@@ -1,10 +1,10 @@
 <template>
     <div>
-        <el-row :gutter="10">
+        <el-row :gutter="10" class="ignore-btn">
             <el-col :span="2">
                 <el-button
                         v-show="selections.length > 0"
-                        @click="handleDelete(selections.map(i => i._id))"
+                        @click="handleIgnore(selections.map(i => i._id))"
                         type="danger"
                         round
                         size="mini">忽略
@@ -152,12 +152,14 @@
                 const form = {security: 1, ignore: 1, desc: "", id: id};
                 this.axios
                     .patch(this.api.leakage, form)
-                    .then()
+                    .then(response => {
+                        this.$emit('change')
+                    })
                     .catch(error => {
                         this.$message.error(error.toString());
                     });
             },
-            handleDelete(leakages) {
+            handleIgnore(leakages) {
                 this.$confirm("此操作将忽略结果, 是否继续?", "提示", {
                     confirmButtonText: "确定",
                     cancelButtonText: "取消",
@@ -183,6 +185,10 @@
     };
 </script>
 <style>
+    .ignore-btn{
+        margin-top: 10px
+
+    }
     a {
         color: #0366d6;
         text-decoration: none;

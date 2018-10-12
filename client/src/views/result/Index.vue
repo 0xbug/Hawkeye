@@ -64,7 +64,7 @@
                     </el-col>
                 </el-row>
             </el-form>
-            <ResultsTable :results="leakagesData"></ResultsTable>
+            <ResultsTable :results="leakagesData" @change="handleChange"></ResultsTable>
             <div class="page" v-if="leakagesData">
                 <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
                                :current-page="from" :page-sizes="[10, 20, 50,100]" :page-size="limit"
@@ -136,6 +136,10 @@
             handleTagSelected() {
                 this.fetchLeakagesData();
                 this.fetchTrend();
+            },
+            handleChange(){
+            this.fetchTrend();
+            this.fetchLeakagesData();
             },
             fetchLeakagesData() {
                 this.axios
