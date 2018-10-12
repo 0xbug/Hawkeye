@@ -1,7 +1,0 @@
-[program:Hawkeye]
-command=项目绝对路径/venv/bin/gunicorn -w4 -b0.0.0.0:端口 Hawkeye:app
-directory=项目绝对路径
-startsecs=0
-stopwaitsecs=0
-autostart=true
-autorestart=true
