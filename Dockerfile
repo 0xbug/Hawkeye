@@ -4,13 +4,11 @@ ENV TZ=Asia/Shanghai
 EXPOSE 80
 COPY ./deploy/apt/sources.list /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y wget gnupg curl redis-server supervisor git
+RUN apt-get install --no-install-recommends -y curl gnupg git redis-server supervisor software-properties-common wget
 RUN curl https://openresty.org/package/pubkey.gpg | apt-key add -
-RUN apt-get -y install software-properties-common
 RUN add-apt-repository -y "deb http://openresty.org/package/debian $(lsb_release -sc) openresty"
 RUN apt-get update
 RUN apt-get install -y openresty
-RUN mkdir -p /root/.pip
 COPY ./deploy /Hawkeye/deploy
 RUN cp /Hawkeye/deploy/pyenv/*.conf /root/.pip/
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r /Hawkeye/deploy/pyenv/requirements.txt -U
