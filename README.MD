@@ -37,7 +37,7 @@
 
 *   Python 3.x
 *   Flask
-*   MongoDB
+*   MongoDB >= 3.x
 
 ## 支持平台
 
