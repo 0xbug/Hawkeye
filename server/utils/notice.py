@@ -13,7 +13,10 @@ class SMTPServer(object):
         self.debug = smtp_config.get('debug')
         self.header_from = smtp_config.get('from')
         try:
-            self.smtp = smtplib.SMTP(self.host, self.port, timeout=10)
+            if self.tls:
+                self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
+            else:
+                self.smtp = smtplib.SMTP_SSL(self.host, self.port, timeout=300)
             self.smtp.set_debuglevel(self.debug)
         except Exception as error:
             print(error)
