@@ -10,7 +10,7 @@ class SMTPServer(object):
         self.tls = smtp_config.get('tls')
         self.username = smtp_config.get('username')
         self.password = smtp_config.get('password')
-        self.header_from = smtp_config.get('from')
+        self.header_from = smtp_config.get('username')
         try:
             if self.tls:
                 self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
