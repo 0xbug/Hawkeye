@@ -10,14 +10,12 @@ class SMTPServer(object):
         self.tls = smtp_config.get('tls')
         self.username = smtp_config.get('username')
         self.password = smtp_config.get('password')
-        self.debug = smtp_config.get('debug')
         self.header_from = smtp_config.get('from')
         try:
             if self.tls:
                 self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
             else:
                 self.smtp = smtplib.SMTP_SSL(self.host, self.port, timeout=300)
-            self.smtp.set_debuglevel(self.debug)
         except Exception as error:
             print(error)
 
@@ -52,7 +50,6 @@ def mail_notice(smtp_config, receivers, content):
     message['From'] = Header('<{}>'.format(smtp_config.get('from')), 'utf-8')
     message['To'] = Header(','.join(receivers), 'utf-8')
     message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
-    print(smtp_config)
     try:
         smtp = SMTPServer(smtp_config)
         print('login')
