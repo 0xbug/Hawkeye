@@ -111,10 +111,11 @@ def search(query, page, g, github_username):
 
                 logger.info('抓取关键字：{} {}'.format(query.get('tag'), leakage.get('link')))
     except Exception as error:
-        g, github_username = new_github()
-        search.schedule(
-            args=(query, page, g, github_username),
-            delay=huey.pending_count() + huey.scheduled_count())
+        if 'Not Found' not in error:
+            g, github_username = new_github()
+            search.schedule(
+                args=(query, page, g, github_username),
+                delay=huey.pending_count() + huey.scheduled_count())
         logger.critical(error)
         logger.error('抓取: tag is {} keyword is {}, page is {} 失败'.format(
             query.get('tag'), query.get('keyword'), page + 1))

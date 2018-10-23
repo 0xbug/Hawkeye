@@ -10,7 +10,6 @@ class SMTPServer(object):
         self.tls = smtp_config.get('tls')
         self.username = smtp_config.get('username')
         self.password = smtp_config.get('password')
-        self.header_from = smtp_config.get('username')
         try:
             if self.tls:
                 self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
@@ -35,7 +34,7 @@ class SMTPServer(object):
         :return:
         """
         message = message.as_string()
-        self.smtp.sendmail(self.header_from, receivers, message)
+        self.smtp.sendmail(self.username, receivers, message)
 
 
 def mail_notice(smtp_config, receivers, content):
@@ -47,8 +46,8 @@ def mail_notice(smtp_config, receivers, content):
     """
 
     message = MIMEText(content, _subtype='html', _charset='utf-8')
-    message['From'] = Header('{}<{}>'.format(smtp_config.get('from'),smtp_config.get('username')), 'utf-8')
-    message['To'] = Header(','.join(receivers), 'utf-8')
+    message['From'] = Header('{}<{}>'.format(smtp_config.get('from'), smtp_config.get('username')), 'utf-8')
+    message['To'] = Header(';'.join(receivers), 'utf-8')
     message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
     try:
         smtp = SMTPServer(smtp_config)
