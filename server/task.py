@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+import random
 import requests
 import smtplib
 import time
@@ -111,7 +112,7 @@ def search(query, page, g, github_username):
 
                 logger.info('抓取关键字：{} {}'.format(query.get('tag'), leakage.get('link')))
     except Exception as error:
-        if 'Not Found' not in error:
+        if 'Not Found' not in error.data:
             g, github_username = new_github()
             search.schedule(
                 args=(query, page, g, github_username),
@@ -255,7 +256,7 @@ def new_github():
     else:
         logger.error('请配置github账号')
         return
-    github_account = list(github_col.find().sort('rate_remaining', DESCENDING))[0]
+    github_account = random.choice(list(github_col.find({"rate_limit":{"$gt":5}}).sort('rate_remaining', DESCENDING)))
     github_username = github_account.get('username')
     github_password = github_account.get('password')
     g = Github(github_username, github_password)
@@ -283,7 +284,7 @@ def check():
         page = int(setting_col.find_one({'key': 'task'}).get('page'))
         for p in range(0, page):
             for query in query_col.find({'enabled': True}).sort('last', ASCENDING):
-                github_account = list(github_col.find().sort('rate_remaining', ASCENDING))[0]
+                github_account = random.choice(list(github_col.find({"rate_limit":{"$gt":5}}).sort('rate_remaining', DESCENDING)))
                 github_username = github_account.get('username')
                 github_password = github_account.get('password')
                 rate_remaining = github_account.get('rate_remaining')
