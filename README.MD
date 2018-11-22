@@ -45,6 +45,10 @@
 
 
 ## 安装(Docker 部署)
+```
+docker pull daocloud.io/0xbug/hawkeye
+```
+或者手动 build
 
 克隆项目到本地
 
@@ -62,7 +66,7 @@ Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改�
 
 
 
-## 说明
+## 捐赠
 
-> 如果对您有帮助，您可以点右上角 Star 支持一下 谢谢！
-或者您可以 [follow](https://github.com/0xbug?utf8=%E2%9C%93&tab=repositories&q=&type=source&language=) 一下
+> 如果该项目对您有帮助，您可以捐赠支持一下 谢谢！
+![](https://user-images.githubusercontent.com/12611275/48882508-a9035980-ee55-11e8-9b2f-59346504e196.png)
