@@ -2,7 +2,6 @@ FROM python:3.7
 LABEL MAINTAINER=0xbug
 ENV TZ=Asia/Shanghai
 EXPOSE 80
-COPY ./deploy/apt/sources.list /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y curl gnupg git redis-server supervisor software-properties-common wget
 RUN curl https://openresty.org/package/pubkey.gpg | apt-key add -
