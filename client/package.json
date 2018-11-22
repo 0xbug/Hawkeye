@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,8 +10,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "dayjs": "^1.7.7",
-    "element-ui": "^2.4.8",
-    "highlight.js": "^9.12.0",
+    "element-ui": "^2.4.11",
+    "highlight.js": "^9.13.1",
     "js-base64": "^2.4.9",
     "timeago.js": "^4.0.0-beta.1",
     "vue": "^2.5.17",
@@ -19,15 +19,15 @@
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.5",
-    "@vue/cli-plugin-eslint": "^3.0.5",
-    "@vue/cli-service": "^3.0.5",
-    "@vue/eslint-config-prettier": "^3.0.5",
-    "babel-plugin-import": "^1.9.1",
+    "@vue/cli-plugin-babel": "^3.1.1",
+    "@vue/cli-plugin-eslint": "^3.1.5",
+    "@vue/cli-service": "^3.1.4",
+    "@vue/eslint-config-prettier": "^4.0.1",
+    "babel-plugin-import": "^1.11.0",
     "less": "^3.8.1",
     "postcss-loader": "^3.0.0",
     "less-loader": "^4.1.0",
-    "node-sass": "^4.9.3",
+    "node-sass": "^4.10.0",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.5.17"
   }

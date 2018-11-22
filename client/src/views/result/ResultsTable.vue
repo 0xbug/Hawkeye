@@ -29,14 +29,14 @@
                     width="200"
             >
                 <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
+                            <i class="iconfont icon-time_fill"></i>
                     {{scope.row.datetime|dateFormat}}
                 </template>
             </el-table-column>
 
             <el-table-column
                     label="项目"
-                    width="250"
+                    width="200"
                     show-overflow-tooltip
             >
                 <template slot-scope="scope">
@@ -60,12 +60,12 @@
             <el-table-column
                     prop="filename"
                     label="文件名"
+                    width="200"
                     show-overflow-tooltip
-
             >
                 <template slot-scope="scope">
                     <router-link :to="'/view/leakage/'+scope.row._id" target="_blank">
-                        {{scope.row.filename}} <i class="iconfont icon-prompt"></i>
+                        {{scope.row.filename}} 
                     </router-link>
 
                 </template>
@@ -73,7 +73,6 @@
             </el-table-column>
             <el-table-column
                     label="备注"
-                    width="200"
                     show-overflow-tooltip
             >
                 <template slot-scope="scope" v-if="scope.row.desc">
@@ -85,7 +84,7 @@
             </el-table-column>
             <el-table-column
                     label="标签"
-                    width="200"
+                    width="100"
                     show-overflow-tooltip
             >
                 <template slot-scope="scope">
@@ -107,10 +106,9 @@
 
                 </template>
             </el-table-column>
-
             <el-table-column
                     label="操作"
-                    width="350"
+                    width="300"
             >
                 <template slot-scope="scope">
                     <el-button-group>
@@ -207,6 +205,6 @@
     }
 
     .project-info img {
-        margin-right: 5px;
+        margin-right: 2px;
     }
 </style>

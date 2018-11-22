@@ -20,7 +20,6 @@ body {
     line-height: 1.5;
     color: #24292e;
     margin: 0;
-    /*min-width: 1200px;*/
     background-color: rgb(245, 246, 247);
 }
 
@@ -79,7 +78,6 @@ a {
 
 .el-tag {
     border: none !important;
-    font-size: 14px;
     font-weight: normal !important;
 }
 
@@ -141,14 +139,6 @@ a {
 
 .hljs {
     background-color: #fff !important;
-}
-
-#codelist img {
-    /*border-radius: 40px!important;*/
-}
-
-#codelist span.text-small.text-gray.match-count.mr-2 {
-    display: none;
 }
 
 a {
