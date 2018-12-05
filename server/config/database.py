@@ -10,11 +10,6 @@ else:
 client = MongoClient(MONGODB_URI, connect=False)
 db = client.get_database('hawkeye')
 
-if os.environ.get('MONGODB_USER'):
-    MONGODB_USER = os.environ.get('MONGODB_USER')
-    MONGODB_PASSWORD = os.environ.get('MONGODB_PASSWORD')
-    db.authenticate(MONGODB_USER, MONGODB_PASSWORD)
-
 result_col = db.get_collection('result')
 query_col = db.get_collection('query')
 blacklist_col = db.get_collection('blacklist')
