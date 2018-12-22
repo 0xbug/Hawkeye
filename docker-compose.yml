@@ -22,6 +22,8 @@ services:
     ports:
       - 8001:80
     environment:
+      WEB_USERNAME: admin
+      WEB_PASSWORD: hawkeye
       MONGODB_URI: mongodb://hawkeye:hawkeye@mongodb:27017/hawkeye
       MONGODB_USER: hawkeye
       MONGODB_PASSWORD: hawkeye
