@@ -149,9 +149,8 @@
 </template>
 
 <script>
-    import Timeago from "timeago.js";
+    import {format} from "timeago.js";
 
-    const timeagoInstance = new Timeago();
     export default {
         data() {
             return {
@@ -185,7 +184,7 @@
                     });
             },
             handleSpiderResult(result) {
-                const last = timeagoInstance.format(result.last * 1000, "zh_CN");
+                const last = format(result.last * 1000, "zh_CN");
                 if (result.status > -1) {
                     this.$message.success(last + result.reason);
                 } else {
