@@ -5,7 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -16,7 +18,8 @@
     "timeago.js": "^4.0.0-beta.1",
     "vue": "^2.5.17",
     "vue-highlight.js": "^2.2.0",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "snyk": "^1.161.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",
@@ -30,5 +33,6 @@
     "node-sass": "^4.10.0",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.5.17"
-  }
+  },
+  "snyk": true
 }
