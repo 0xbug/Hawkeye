@@ -10,7 +10,7 @@ const settingQuery = `${apiUri}/setting/query`;
 const settingCron = `${apiUri}/setting/cron`;
 const settingNotice = `${apiUri}/setting/notice`;
 const settingMail = `${apiUri}/setting/mail`;
-const settingDingTalk = `${apiUri}/setting/dingtalk`;
+const settingWebHook = `${apiUri}/setting/webhook`;
 const settingGithub = `${apiUri}/setting/github`;
 const api = {
   leakage,
@@ -21,7 +21,7 @@ const api = {
   settingNotice,
   settingCron,
   settingGithub,
-  settingDingTalk,
+  settingWebHook,
   settingMail,
   statistic,
   trend

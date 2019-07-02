@@ -14,16 +14,43 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4">
+            <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" v-for="webhook in webhooks">
                 <el-card shadow="hover">
-                    <div :style="styles.dataItem" @click="DingDialogFormVisible=true">
-                        <i class="iconfont icon-dingtalk" :style="styles.dataItemImg"></i>
+                    <el-popover
+                            placement="top"
+                            width="160"
+                            v-model="popoverVisible">
+                        <p>确定删除吗？</p>
+                        <div style="text-align: right; margin: 0">
+                            <el-button size="mini" type="text" @click="popoverVisible = false">取消</el-button>
+                            <el-button type="danger" size="mini" style="padding: 4px"  @click="popoverVisible = false;delWebHookSetting(webhook.webhook)">确定</el-button>
+                        </div>
+                        <i class="iconfont icon-trash" style="float: right;color: #868898" slot="reference"></i>
+                    </el-popover>
+                    <div :style="styles.dataItem" @click="WebHookDialogFormVisible=true;webhook_setting=webhook">
+                        <i class="iconfont icon-dingtalk" :style="styles.dataItemImg"
+                           v-if="webhook.webhook.indexOf('dingtalk')>-1"></i>
+                        <i class="iconfont icon-wechat-fill" :style="styles.dataItemImg"
+                           v-if="webhook.webhook.indexOf('weixin')>-1"></i>
                         <div :style="styles.dataItemUnit">
-                            <div :style="styles.unitAmount">钉钉</div>
+                            <div :style="styles.unitAmount" v-if="webhook.webhook.indexOf('dingtalk')>-1">钉钉</div>
+                            <div :style="styles.unitAmount" v-if="webhook.webhook.indexOf('weixin')>-1">企业微信</div>
+                            <div :style="styles.unitFooter">{{webhook.webhook.split('=')[1].slice(0,8)}}</div>
                             <div :style="styles.unitFooter">状态：<span
-                                    :style="dingtalk.enabled?'color:#52c41a':'color:#f5222d'">{{dingtalk.enabled?'开启':'关闭'}}
+                                    :style="webhook.enabled?'color:#52c41a':'color:#f5222d'">{{webhook.enabled?'开启':'关闭'}}
                             </span>
                             </div>
+                        </div>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4">
+                <el-card shadow="hover">
+                    <div :style="styles.dataItem" @click="WebHookDialogFormVisible=true;webhook_setting={}">
+                        <i class="iconfont icon-plus" :style="styles.dataItemImg"></i>
+                        <div :style="styles.dataItemUnit">
+                            <div :style="styles.unitAmountSmall">添加钉钉/微信告警</div>
+                            <div :style="styles.unitFooter">oapi.dingtalk.com qyapi.weixin.qq.com</div>
                         </div>
                     </div>
                 </el-card>
@@ -78,32 +105,40 @@
                 <el-button size="mini" type="primary" round @click="setSMTPServer">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="钉钉配置" :visible.sync="DingDialogFormVisible" v-model="DingDialogFormVisible"
+        <el-dialog :visible.sync="WebHookDialogFormVisible" v-model="WebHookDialogFormVisible"
                    :width="mobileClient?'80%':'50%'">
-            <el-form :model="dingtalk">
+            <div slot="title" :style="styles.unitAmountSmall">
+                webhook 配置
+                目前支持 钉钉/企业微信
+            </div>
+
+            <el-form :model="webhook_setting">
+
                 <el-form-item label="webhook">
-                    <el-input v-model="dingtalk.webhook"
-                              placeholder="https://oapi.dingtalk.com/robot/send?access_token="></el-input>
+                    <el-input v-model="webhook_setting.webhook"
+                              placeholder="https://oapi.dingtalk.com/robot/send?access_token=xxx 或 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx"></el-input>
                 </el-form-item>
                 <el-form-item label="监控平台地址">
-                    <el-input v-model="dingtalk.domain"
+                    <el-input v-model="webhook_setting.domain"
                               :placeholder="origin"></el-input>
                 </el-form-item>
                 <el-form-item label="开启通知">
                     <el-switch
-                            v-model="dingtalk.enabled"
+                            v-model="webhook_setting.enabled"
                             active-color="#13ce66"
                             inactive-color="#ff4949">
                     </el-switch>
                 </el-form-item>
                 <el-form-item label="测试">
-                    <el-button size="mini" round @click="testDingTalk">发送一条测试消息</el-button>
+                    <el-button size="mini" round @click="testWebHookSetting"
+                               :disabled="!webhook_setting.hasOwnProperty('webhook')">发送一条测试消息
+                    </el-button>
                 </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button size="mini" round @click="DingDialogFormVisible = false">取 消</el-button>
-                <el-button size="mini" type="primary" round @click="setDingTalk">确 定</el-button>
+                <el-button size="mini" round @click="WebHookDialogFormVisible = false">取 消</el-button>
+                <el-button size="mini" type="primary" round @click="setWebHookSetting">确 定</el-button>
             </div>
         </el-dialog>
         <div v-if="smtp_server.enabled">
@@ -168,6 +203,10 @@
             color: "#333",
             fontSize: "24px"
         },
+        unitAmountSmall: {
+            color: "#999",
+            fontSize: "14px"
+        },
         unitFooter: {
             color: "#999",
             fontSize: "12px"
@@ -179,12 +218,14 @@
                 styles,
                 origin: window.location.origin,
                 inputValue: "",
+                popoverVisible: false,
                 MailDialogFormVisible: false,
-                DingDialogFormVisible: false,
+                WebHookDialogFormVisible: false,
                 mails: [],
                 formLabelWidth: "200",
                 smtp_server: {},
-                dingtalk: {}
+                webhook_setting: {domain: window.location.origin},
+                webhooks: []
             };
         },
         computed: {
@@ -245,45 +286,68 @@
                         this.$message.error(error.toString());
                     });
             },
-            getDingTalk() {
+            getWebHookSetting() {
                 this.axios
-                    .get(this.api.settingDingTalk)
+                    .get(this.api.settingWebHook)
                     .then(response => {
-                        if (response.data.result) {
-                            this.dingtalk = response.data.result;
+                        this.webhooks = response.data.result;
+
+                    })
+                    .catch(error => {
+                        this.$message.error(error.toString());
+                    });
+            },
+            delWebHookSetting(webhook) {
+                this.axios
+                    .delete(this.api.settingWebHook, {params: {webhook: webhook}})
+                    .then(response => {
+                        if (response.data.status === 404) {
+                            this.$message.error(response.data.msg);
+
+                        } else {
+                            this.$message.success(response.data.msg);
+                            this.getWebHookSetting()
+
+                        }
+
+                    })
+                    .catch(error => {
+                        this.$message.error(error.toString());
+                    });
+            },
+            setWebHookSetting() {
+                this.axios
+                    .post(this.api.settingWebHook, this.webhook_setting)
+                    .then(response => {
+                        if (response.data.status === 400) {
+                            this.$message.error(response.data.msg);
+
+                        } else {
+                            this.$message.success(response.data.msg);
+                            this.WebHookDialogFormVisible = false;
+                            this.getWebHookSetting()
                         }
                     })
                     .catch(error => {
                         this.$message.error(error.toString());
                     });
             },
-            setDingTalk() {
+            testWebHookSetting() {
+                this.webhook_setting.test = true;
                 this.axios
-                    .post(this.api.settingDingTalk, this.dingtalk)
-                    .then(response => {
-                        this.$message.success(response.data.msg);
-                        this.DingDialogFormVisible = false;
-                    })
-                    .catch(error => {
-                        this.$message.error(error.toString());
-                    });
-            },
-            testDingTalk() {
-                this.dingtalk.test = true;
-                this.axios
-                    .post(this.api.settingDingTalk, this.dingtalk)
+                    .post(this.api.settingWebHook, this.webhook_setting)
                     .then(response => {
                         if (response.data.status === 201) {
                             this.$message.success(response.data.msg);
                         } else {
                             this.$message.error(response.data.msg);
                         }
-                        this.dingtalk.test = false;
+                        this.webhook_setting.test = false;
 
                     })
                     .catch(error => {
                         this.$message.error(error.toString());
-                        this.dingtalk.test = false;
+                        this.webhook_setting.test = false;
 
                     });
             },
@@ -300,7 +364,7 @@
             }
         },
         mounted: function () {
-            this.getDingTalk();
+            this.getWebHookSetting();
             this.getSMTPServer();
             this.fetchNoticeMails();
         }
@@ -322,14 +386,17 @@
 <style lang="scss">
     .dashboard {
         margin-bottom: 10px;
+
         .el-card {
             margin-bottom: 5px;
         }
+
         .dashboard-icon {
             width: 60px;
             height: 60px;
             background-color: #1890ff;
             border-radius: 60px;
+
             i {
                 font-size: 60px;
                 text-align: center;

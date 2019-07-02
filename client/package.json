@@ -8,27 +8,27 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "dayjs": "^1.7.7",
-    "element-ui": "^2.4.11",
-    "highlight.js": "^9.13.1",
-    "js-base64": "^2.4.9",
-    "timeago.js": "^4.0.0-beta.1",
-    "vue": "^2.5.17",
-    "vue-highlight.js": "^2.2.0",
-    "vue-router": "^3.0.1"
+    "axios": "^0.19.0",
+    "dayjs": "^1.8.14",
+    "element-ui": "^2.10.0",
+    "highlight.js": "^9.15.8",
+    "js-base64": "^2.5.1",
+    "timeago.js": "^4.0.0-beta.2",
+    "vue": "^2.6.10",
+    "vue-highlight.js": "^3.1.0",
+    "vue-router": "^3.0.6"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.1.1",
-    "@vue/cli-plugin-eslint": "^3.1.5",
-    "@vue/cli-service": "^3.1.4",
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-plugin-eslint": "^3.8.0",
+    "@vue/cli-service": "^3.8.4",
     "@vue/eslint-config-prettier": "^4.0.1",
-    "babel-plugin-import": "^1.11.0",
-    "less": "^3.8.1",
+    "babel-plugin-import": "^1.12.0",
+    "less": "^3.9.0",
     "postcss-loader": "^3.0.0",
-    "less-loader": "^4.1.0",
-    "node-sass": "^4.10.0",
+    "less-loader": "^5.0.0",
+    "node-sass": "^4.12.0",
     "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.6.10"
   }
 }

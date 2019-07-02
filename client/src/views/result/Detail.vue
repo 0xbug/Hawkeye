@@ -33,7 +33,7 @@
                         </el-form-item>
                         <el-form-item label="命中标签">
                             <el-tag size="mini" type="danger">
-                                <router-link :to="{name:'tag',params:{tag:leakageInfo.tag}}">{{leakageInfo.tag}}
+                                <router-link :to="{name:'index',query:{tag:leakageInfo.tag}}">{{leakageInfo.tag}}
                                 </router-link>
                             </el-tag>
                         </el-form-item>

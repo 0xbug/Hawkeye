@@ -33,3 +33,11 @@ else:
     REDIS_PORT = 6379
 result_cache = Redis(host=REDIS_HOST, port=REDIS_PORT,
                      db=1, decode_responses=True)
+
+
+def create_indexes():
+    for filed in ['language', 'tag', 'datetime', 'security', 'desc', 'ignore', 'timestamp']:
+        try:
+            result_col.create_index(filed, background=True)
+        except:
+            pass

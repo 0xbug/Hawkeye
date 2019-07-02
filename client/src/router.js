@@ -10,7 +10,6 @@ const routes = [
     {
         path: "/", name: "index", meta: {name: '首页'}, component: LeakageData
     },
-    {path: "/view/tag/:tag", name: "tag", meta: {name: '筛选'}, component: LeakageData},
     {path: "/view/leakage/:id", name: 'detail', meta: {name: '详情'}, component: Detail},
     {path: "/setting/:tab", name: "setting", meta: {name: '设置'}, component: Setting}
 ];

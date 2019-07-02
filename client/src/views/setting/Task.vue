@@ -17,7 +17,8 @@
                 ></el-input-number>
             </el-form-item>
         </el-form>
-        <el-button type="primary" size="small" style="margin-left: 150px;width: 130px" @click="handleTaskSet">确认</el-button>
+        <el-button type="primary" size="small" style="margin-left: 150px;width: 130px" @click="handleTaskSet">确认
+        </el-button>
 
     </div>
 
@@ -49,8 +50,12 @@
                 this.axios
                     .get(this.api.settingCron)
                     .then(response => {
-                        this.page = response.data.result.page;
-                        this.minute = response.data.result.minute;
+                        if (response.data.status === 400) {
+                            this.$message.error(response.data.msg);
+                        } else {
+                            this.page = response.data.result.page;
+                            this.minute = response.data.result.minute;
+                        }
                     })
                     .catch(error => {
                         this.$message.error(error.toString());

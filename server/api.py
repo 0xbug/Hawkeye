@@ -3,8 +3,9 @@
 from flask import Flask
 from flask_restful import Api
 from controllers.result import Leakage, LeakageCode, LeakageInfo
-from controllers.setting import Blacklist, Cron, Notice, Query, GithubAccount, SMTPServer, DingTalk
+from controllers.setting import Blacklist, Cron, Notice, Query, GithubAccount, SMTPServer, WebHookNotice
 from controllers.statistic import Dashboard, Statistic
+from controllers.health import Status
 import re
 import sys
 
@@ -14,12 +15,13 @@ if sys.hexversion > 0x03070000:
 app = Flask(__name__)
 api = Api(app)
 
+api.add_resource(Status, '/api/health')
 api.add_resource(Leakage, '/api/leakage')
 api.add_resource(Cron, '/api/setting/cron')
 api.add_resource(Query, '/api/setting/query')
 api.add_resource(Notice, '/api/setting/notice')
 api.add_resource(GithubAccount, '/api/setting/github')
-api.add_resource(DingTalk, '/api/setting/dingtalk')
+api.add_resource(WebHookNotice, '/api/setting/webhook')
 api.add_resource(SMTPServer, '/api/setting/mail')
 api.add_resource(Dashboard, '/api/trend')
 api.add_resource(Statistic, '/api/statistic')

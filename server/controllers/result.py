@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
-from config.database import result_col, DESCENDING
+from config.database import result_col, DESCENDING,create_indexes
 import json
 
 
@@ -15,6 +15,7 @@ class Leakage(Resource):
         args = parser.parse_args()
         status = json.loads(args.get('status'))
         filters = status
+        create_indexes()
         if args.get('tag'):
             filters = dict({'tag': args.get('tag')}, **filters)
         if args.get('language'):

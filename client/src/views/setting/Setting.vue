@@ -2,6 +2,7 @@
     <el-tabs
             v-model="activeName"
             type="border-card"
+            lazy
             @tab-click="handleTabClick"
             :active-name="activeName">
         <el-tab-pane name="rule">

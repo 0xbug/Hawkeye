@@ -48,7 +48,7 @@
         <el-table :data="rules" :stripe="true">
             <el-table-column label="名称">
                 <template slot-scope="scope">
-                    <router-link :to="'/view/tag/'+scope.row.tag">
+                    <router-link :to="'/?tag='+scope.row.tag">
                         {{scope.row.tag}}
                     </router-link>
                 </template>

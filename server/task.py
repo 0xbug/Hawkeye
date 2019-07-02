@@ -35,7 +35,7 @@ else:
 @huey.task()
 def search(query, page, g, github_username):
     mail_notice_list = []
-    ding_notice_list = []
+    webhook_notice_list = []
     logger.info('开始抓取: tag is {} keyword is {}, page is {}'.format(
         query.get('tag'), query.get('keyword'), page + 1))
     try:
@@ -74,8 +74,8 @@ def search(query, page, g, github_username):
                 }
                 try:
                     leakage['affect'] = get_affect_assets(repo.decoded_content)
-                except:
-                    logger.critical(leakage.get('link'))
+                except Exception as error:
+                    logger.critical('{} {}'.format(error, leakage.get('link')))
                     leakage['affect'] = []
                 if int(repo.raw_headers.get('x-ratelimit-remaining')) == 0:
                     logger.critical('剩余使用次数: {}'.format(
@@ -100,7 +100,7 @@ def search(query, page, g, github_username):
                     mail_notice_list.append(
                         '上传时间:{} 地址: <a href={}>{}/{}</a>'.format(leakage.get('datetime'), leakage.get('link'),
                                                                   leakage.get('project'), leakage.get('filename')))
-                    ding_notice_list.append(
+                    webhook_notice_list.append(
                         '[{}/{}]({}) 上传于 {}'.format(leakage.get('project').split('.')[-1],
                                                     leakage.get('filename'), leakage.get('link'),
                                                     leakage.get('datetime')))
@@ -131,39 +131,43 @@ def search(query, page, g, github_username):
     if setting_col.count({'key': 'mail', 'enabled': True}) and len(mail_notice_list):
         main_content = '<h2>规则名称: {}</h2><br>{}'.format(query.get('tag'), '<br>'.join(mail_notice_list))
         send_mail(main_content)
-    logger.info(len(ding_notice_list))
-    if setting_col.count({'key': 'dingtalk', 'enabled': True}) and len(ding_notice_list):
-        dingtalk(query.get('tag'), ding_notice_list)
+    logger.info(len(webhook_notice_list))
+    webhook_notice(query.get('tag'), webhook_notice_list)
 
 
 @huey.task()
-def dingtalk(tag, results):
-    """
-
-    :param tag:
-    :param results:
-    :return:
-    """
+def webhook_notice(tag, results):
     if len(results):
-        hostname = setting_col.find_one({'key': 'dingtalk', 'enabled': True}).get('domain')
-        webhook = setting_col.find_one({'key': 'dingtalk', 'enabled': True}).get('webhook')
-        __content = {
-            "msgtype": "markdown",
-            "markdown": {"title": "GitHub泄露",
-                         "text": '#### [规则名称: {}]({}/view/tag/{})\n\n- {}'.format(tag, hostname, tag,
-                                                                                  '\n- '.join(results))
-                         },
-            "at": {
-                "atMobiles": [
+        for webhook_setting in setting_col.find({'webhook': {'$exists': True}, 'enabled': True},
+                                                {'domain': 1, 'webhook': 1, '_id': 0}):
+            hostname = webhook_setting.get('domain')
+            webhook = webhook_setting.get('webhook')
+            if 'oapi.dingtalk.com' in webhook:
+                content = {
+                    "msgtype": "markdown",
+                    "markdown": {"title": "GitHub泄露",
+                                 "text": '#### [规则名称: {}]({}/?tag={})\n\n- {}'.format(tag, hostname, tag,
+                                                                                          '\n- '.join(results))
+                                 },
+                    "at": {
+                        "atMobiles": [
 
-                ],
-                "isAtAll": False
-            }
-        }
+                        ],
+                        "isAtAll": False
+                    }
+                }
+            else:
 
-        requests.post(
-            webhook,
-            json=__content)
+                content = {
+                    "msgtype": "markdown",
+                    "markdown": {
+                        "content": '#### [规则名称: {}]({}/?tag={})\n\n- {}'.format(tag, hostname, tag,
+                                                                                    '\n- '.join(results))
+                    }
+                }
+            requests.post(
+                webhook,
+                json=content)
 
 
 def get_domain(target):
@@ -256,7 +260,7 @@ def new_github():
     else:
         logger.error('请配置github账号')
         return
-    github_account = random.choice(list(github_col.find({"rate_limit":{"$gt":5}}).sort('rate_remaining', DESCENDING)))
+    github_account = random.choice(list(github_col.find({"rate_limit": {"$gt": 5}}).sort('rate_remaining', DESCENDING)))
     github_username = github_account.get('username')
     github_password = github_account.get('password')
     g = Github(github_username, github_password)
@@ -284,7 +288,8 @@ def check():
         page = int(setting_col.find_one({'key': 'task'}).get('page'))
         for p in range(0, page):
             for query in query_col.find({'enabled': True}).sort('last', ASCENDING):
-                github_account = random.choice(list(github_col.find({"rate_limit":{"$gt":5}}).sort('rate_remaining', DESCENDING)))
+                github_account = random.choice(
+                    list(github_col.find({"rate_limit": {"$gt": 5}}).sort('rate_remaining', DESCENDING)))
                 github_username = github_account.get('username')
                 github_password = github_account.get('password')
                 rate_remaining = github_account.get('rate_remaining')

@@ -36,7 +36,10 @@ class System(Resource):
 class Cron(Resource):
     def get(self):
         result = setting_col.find_one({'key': 'task'}, {'_id': 0})
-        data = {'status': 200, 'msg': '获取信息成功', 'result': result}
+        if result:
+            data = {'status': 200, 'msg': '获取信息成功', 'result': result}
+        else:
+            data = {'status': 400, 'msg': '请配置查询页数和周期', 'result': result}
         return jsonify(data)
 
     def post(self):
@@ -143,59 +146,80 @@ class SMTPServer(Resource):
         return jsonify(data)
 
 
-class DingTalk(Resource):
+class WebHookNotice(Resource):
     """
-    钉钉 通知
+    WebHook 通知
     """
 
     def get(self):
-        result = setting_col.find_one({'key': 'dingtalk'}, {'_id': 0})
+        result = list(setting_col.find({'webhook': {'$exists': True}}, {'_id': 0}))
         data = {'status': 200, 'msg': '获取信息成功', 'result': result}
+        return jsonify(data)
+
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('webhook', type=str, required=True, help='WebHook URL')
+        args = parser.parse_args()
+        delete_result = setting_col.delete_one({'webhook': args.get('webhook')})
+        if delete_result.deleted_count == 1:
+            data = {'status': 200, 'msg': '删除成功', 'result': []}
+        else:
+            data = {'status': 404, 'msg': '删除失败', 'result': []}
         return jsonify(data)
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('webhook', type=str, help='DingTalk WebHook URL')
+        parser.add_argument('webhook', type=str, required=True, help='WebHook URL')
         parser.add_argument('domain', type=str, help='System URL Host')
-        parser.add_argument('enabled', type=inputs.boolean, default=False, help='Enabled DingTalk Notice')
-        parser.add_argument('test', type=inputs.boolean, default=False, help='Test DingTalk Notice')
+        parser.add_argument('enabled', type=inputs.boolean, default=False, help='Enabled Notice')
+        parser.add_argument('test', type=inputs.boolean, default=False, help='Test Notice')
         args = parser.parse_args()
-        __setting = args
-        __setting['webhook'] = str(args.get('webhook'))
-        if not (urlparse(__setting.get('webhook')).netloc == 'oapi.dingtalk.com' and urlparse(
-                __setting.get('webhook')).scheme == 'https'):
-            data = {'status': 400, 'msg': '错误的webhook地址', 'result': []}
+        if urlparse(args.get('webhook')).netloc not in ['oapi.dingtalk.com', 'qyapi.weixin.qq.com'] or urlparse(
+                args.get('webhook')).scheme != 'https':
+            data = {'status': 400, 'msg': '错误的 webhook 地址', 'result': []}
             return jsonify(data)
         if args.get('test'):
-            test_content = {
-                "msgtype": "markdown",
-                "markdown": {"title": "GitHub泄露",
-                             "text": '### 规则名称: [钉钉告警测试]()'
-                             },
-                "at": {
-                    "atMobiles": [
+            if urlparse(args.get('webhook')).netloc == 'oapi.dingtalk.com':
+                test_content = {
+                    "msgtype": "markdown",
+                    "markdown": {"title": "GitHub泄露",
+                                 "text": '### 规则名称: [WebHook告警测试]({})'.format(args.get('domain'))
+                                 },
+                    "at": {
+                        "atMobiles": [
 
-                    ],
-                    "isAtAll": False
+                        ],
+                        "isAtAll": False
+                    }
                 }
-            }
+            else:
+                test_content = {
+                    "msgtype": "markdown",
+                    "markdown": {
+                        "content": '### 规则名称: [WebHook告警测试]({})'.format(args.get('domain'))
+                    }
+                }
 
             response = requests.post(
                 args.get('webhook'),
                 json=test_content)
             if response.ok:
                 if response.json().get('errmsg') == 'ok':
-                    data = {'status': 201, 'msg': '已发送，请前往钉钉群查看', 'result': []}
+                    data = {'status': 201, 'msg': '已发送，请前往钉钉/企业微信群查看', 'result': []}
                 else:
-                    data = {'status': 400, 'msg': '发送失败，请检查webhook地址', 'result': []}
+                    data = {'status': 400, 'msg': '发送失败，WebHook 响应: {}'.format(response.json().get('errmsg')),
+                            'result': []}
                 return jsonify(data)
             else:
                 data = {'status': 400, 'msg': '发送失败，请检查服务器网络', 'result': []}
                 return jsonify(data)
-        setting_col.update_many({'key': 'dingtalk'}, {'$set': dict({'key': 'dingtalk'}, **__setting)},
-                                upsert=True)
-        result = setting_col.find_one({'key': 'dingtalk'}, {'_id': 0})
-        data = {'status': 201, 'msg': '设置成功', 'result': result}
+        del args['test']
+        setting_col.update_one({'webhook': args.get('webhook')}, {'$set': args}, upsert=True)
+        result = setting_col.count({'webhook': args.get('webhook')})
+        if result > 0:
+            data = {'status': 201, 'msg': '设置成功', 'result': result}
+        else:
+            data = {'status': 400, 'msg': '设置失败', 'result': result}
         return jsonify(data)
 
 

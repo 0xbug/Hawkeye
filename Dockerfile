@@ -15,4 +15,6 @@ RUN cp /Hawkeye/deploy/supervisor/*.conf /etc/supervisor/conf.d/
 COPY ./client/dist /Hawkeye/client/dist
 COPY ./server /Hawkeye/server
 WORKDIR /Hawkeye/server
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+COPY ./docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+CMD ["./docker-entrypoint.sh"]
