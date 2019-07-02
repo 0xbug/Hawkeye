@@ -8,7 +8,7 @@ import requests
 class Status(Resource):
     def get(self):
         try:
-            github = 'api.github.com' in requests.get('https://api.github.com/').text
+            github = 'api.github.com' in requests.get('https://api.github.com/', timeout=30).text
         except Exception as error:
             github = str(error)
         try:

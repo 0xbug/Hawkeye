@@ -147,7 +147,7 @@ def webhook_notice(tag, results):
                     "msgtype": "markdown",
                     "markdown": {"title": "GitHub泄露",
                                  "text": '#### [规则名称: {}]({}/?tag={})\n\n- {}'.format(tag, hostname, tag,
-                                                                                          '\n- '.join(results))
+                                                                                      '\n- '.join(results))
                                  },
                     "at": {
                         "atMobiles": [
@@ -162,12 +162,15 @@ def webhook_notice(tag, results):
                     "msgtype": "markdown",
                     "markdown": {
                         "content": '#### [规则名称: {}]({}/?tag={})\n\n- {}'.format(tag, hostname, tag,
-                                                                                    '\n- '.join(results))
+                                                                                '\n- '.join(results))
                     }
                 }
-            requests.post(
-                webhook,
-                json=content)
+            try:
+                requests.post(
+                    webhook,
+                    json=content)
+            except Exception as error:
+                logger.error(error)
 
 
 def get_domain(target):

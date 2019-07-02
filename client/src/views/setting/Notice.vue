@@ -16,17 +16,8 @@
             </el-col>
             <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" v-for="webhook in webhooks">
                 <el-card shadow="hover">
-                    <el-popover
-                            placement="top"
-                            width="160"
-                            v-model="popoverVisible">
-                        <p>确定删除吗？</p>
-                        <div style="text-align: right; margin: 0">
-                            <el-button size="mini" type="text" @click="popoverVisible = false">取消</el-button>
-                            <el-button type="danger" size="mini" style="padding: 4px"  @click="popoverVisible = false;delWebHookSetting(webhook.webhook)">确定</el-button>
-                        </div>
-                        <i class="iconfont icon-trash" style="float: right;color: #868898" slot="reference"></i>
-                    </el-popover>
+                    <i class="iconfont icon-trash" style="float: right;color: #868898"
+                       v-on:click="delWebHookSetting(webhook.webhook)"></i>
                     <div :style="styles.dataItem" @click="WebHookDialogFormVisible=true;webhook_setting=webhook">
                         <i class="iconfont icon-dingtalk" :style="styles.dataItemImg"
                            v-if="webhook.webhook.indexOf('dingtalk')>-1"></i>
