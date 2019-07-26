@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    expose:
+      - "27017"
+    environment:
+      ROOT_USERNAME: hawkeye
+      ROOT_PASSWORD: hawkeye
+      MONGO_INITDB_DATABASE: hawkeye
+    volumes:
+      - mongodb-data:/data/db
+      - "./deploy/mongodb/init.sh:/docker-entrypoint-initdb.d/hawkeye.sh"
+
+  hawkeye:
+    image: daocloud.io/0xbug/hawkeye
+    build: .
+    depends_on:
+      - mongodb
+    ports:
+      - 8001:80
+    environment:
+      WEB_USERNAME: admin
+      WEB_PASSWORD: hawkeye
+      MONGODB_URI: mongodb://hawkeye:hawkeye@mongodb:27017/hawkeye
+      MONGODB_USER: hawkeye
+      MONGODB_PASSWORD: hawkeye
+    links:
+      - mongodb
+
+volumes:
+  mongodb-data:
+    driver: local
