@@ -48,7 +48,7 @@ def mail_notice(smtp_config, receivers, content):
     message = MIMEText(content, _subtype='html', _charset='utf-8')
     message['From'] = Header('{}<{}>'.format(smtp_config.get('from'), smtp_config.get('username')), 'utf-8')
     message['To'] = Header(';'.join(receivers), 'utf-8')
-    message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
+    message['Subject'] = Header('[GitHub] 监控告警 for FR', 'utf-8')
     try:
         smtp = SMTPServer(smtp_config)
         print('login')
