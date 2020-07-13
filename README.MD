@@ -61,7 +61,7 @@ docker pull daocloud.io/0xbug/hawkeye
 git clone https://github.com/0xbug/Hawkeye.git --depth 1
 cd Hawkeye
 docker build -t hawkeye .
-docker run -ti -p 80:80 -e MONGODB_URI=mongodb://username:password@ip:27017/hawkeye -e MONGODB_USER= -e MONGODB_PASSWORD= -d hawkeye ## mongodb 需认证
+docker run -ti -p 80:80 -e MONGODB_URI=mongodb://username:password@ip:27017/ -d hawkeye ## mongodb 需认证
 docker run -ti -p 80:80 -e MONGODB_URI=mongodb://ip:27017 -d hawkeye ## mongodb 无认证
 
 ```
