@@ -52,6 +52,11 @@
 ## 安装(Docker 部署)
 ```
 docker pull daocloud.io/0xbug/hawkeye
+## mongodb 需认证
+docker run -ti -p 80:80 -e MONGODB_URI=mongodb://username:password@ip:27017/hawkeye -e MONGODB_USER= -e MONGODB_PASSWORD= -d daocloud.io/0xbug/hawkeye
+## mongodb 无认证
+docker run -ti -p 80:80 -e MONGODB_URI=mongodb://ip:27017 -d daocloud.io/0xbug/hawkeye
+
 ```
 或者手动 build
 
@@ -61,18 +66,12 @@ docker pull daocloud.io/0xbug/hawkeye
 git clone https://github.com/0xbug/Hawkeye.git --depth 1
 cd Hawkeye
 docker build -t hawkeye .
-docker run -ti -p 80:80 -e MONGODB_URI=mongodb://username:password@ip:27017/hawkeye -e MONGODB_USER= -e MONGODB_PASSWORD= -d hawkeye ## mongodb 需认证
-docker run -ti -p 80:80 -e MONGODB_URI=mongodb://ip:27017 -d hawkeye ## mongodb 无认证
+## mongodb 需认证
+docker run -ti -p 80:80 -e MONGODB_URI=mongodb://username:password@ip:27017/hawkeye -e MONGODB_USER= -e MONGODB_PASSWORD= -d hawkeye
+## mongodb 无认证
+docker run -ti -p 80:80 -e MONGODB_URI=mongodb://ip:27017 -d hawkeye
 
 ```
 
 
 Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改测试)
-
-
-
-## 捐赠
-
-> 如果该项目对您有帮助，您可以捐赠支持一下 谢谢！
-
-<img src="https://user-images.githubusercontent.com/12611275/48882508-a9035980-ee55-11e8-9b2f-59346504e196.png" alt="233" width="233"/>
