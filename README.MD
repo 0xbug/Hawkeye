@@ -73,5 +73,16 @@ docker run -ti -p 80:80 -e MONGODB_URI=mongodb://ip:27017 -d hawkeye
 
 ```
 
+或者使用docker安装mongodb
+
+mongodb无认证，快速开始
+```bash
+## 启动mongodb
+docker run -itd --name mongo -p 27017:27017 mongo
+
+## 启动hawkeye
+docker run -ti --link mongo:mongo -p 80:80 -e MONGODB_URI=mongodb://mongo:27017 -d daocloud.io/0xbug/hawkeye
+```
+
 
 Hawkeye 支持 Python *3.x* on Linux and macOS。(2.x兼容性 需自行修改测试)
