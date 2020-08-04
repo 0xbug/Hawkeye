@@ -1,6 +1,7 @@
 import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
+import time
 
 
 class SMTPServer(object):
@@ -11,10 +12,10 @@ class SMTPServer(object):
         self.username = smtp_config.get('username')
         self.password = smtp_config.get('password')
         try:
-            if self.tls:
-                self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
-            else:
+            if self.tls:                
                 self.smtp = smtplib.SMTP_SSL(self.host, self.port, timeout=300)
+            else:                
+                self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
         except Exception as error:
             print(error)
 
@@ -48,7 +49,7 @@ def mail_notice(smtp_config, receivers, content):
     message = MIMEText(content, _subtype='html', _charset='utf-8')
     message['From'] = Header('{}<{}>'.format(smtp_config.get('from'), smtp_config.get('username')), 'utf-8')
     message['To'] = Header(';'.join(receivers), 'utf-8')
-    message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
+    message['Subject'] = Header('[GitHub] 监控告警--'+time.asctime(), 'utf-8')
     try:
         smtp = SMTPServer(smtp_config)
         print('login')
