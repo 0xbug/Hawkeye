@@ -16,7 +16,7 @@
 ## **最近更新**
 
 - 2020-11-20
-    由于 GitHub 官方限制了API的账号密码认证，导致在配置github账号时，账号填生成的[token](https://github.com/settings/tokens)，密码留空
+    由于 GitHub 官方限制了API的账号密码认证，导致在配置github账号时，账号填生成的[token](https://github.com/settings/tokens)，**密码输入空格后删除空格**
     
 - 2019-07-02 v3.0.1
     - 添加健康检查接口 /api/health 
