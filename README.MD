@@ -14,6 +14,10 @@
 
 ![Hawkeye](https://user-images.githubusercontent.com/12611275/46849889-0d2d0980-ce24-11e8-832e-35f6f935bf3b.png)
 ## **最近更新**
+
+- 2020-11-20
+    由于 GitHub 官方限制了API的账号密码认证，导致在配置github账号时，账号填生成的[token](https://github.com/settings/tokens)，密码留空
+    
 - 2019-07-02 v3.0.1
     - 添加健康检查接口 /api/health 
     - 添加企业微信告警
