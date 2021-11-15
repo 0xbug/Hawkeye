@@ -158,6 +158,9 @@
                         <el-button size="mini" type="danger" round @click="handleDeleteNotice(scope.row)">删除
                         </el-button>
 
+                        <el-button size="mini" type="primary" round @click="handleEmailTest(scope.row)">发送测试邮件
+                        </el-button>
+
                     </template>
                 </el-table-column>
             </el-table>
@@ -240,6 +243,21 @@
                 this.inputValue = "";
             },
 
+            handleEmailTest(mail) {
+                this.axios
+                    .post(this.api.settingNotice, {
+                        mail: mail.mail,
+                        test:"true"
+                    })
+                    .then(response => {
+                        console.log(response.data);
+                        this.$message.success("测试邮件已发送至:"+mail.mail+" ,请至邮箱查看邮件是否接收成功。");
+                    })
+                    .catch(error => {
+                        this.$message.error(error.toString());
+                    });
+            },
+
             handleDeleteNotice(mail) {
                 this.axios
                     .delete(this.api.settingNotice, {
@@ -255,6 +273,7 @@
                         this.$message.error(error.toString());
                     });
             },
+
             fetchNoticeMails() {
                 this.axios
                     .get(this.api.settingNotice)
@@ -269,6 +288,8 @@
                 this.axios
                     .get(this.api.settingMail)
                     .then(response => {
+                        console.log(response.data.result);
+
                         if (response.data.result) {
                             this.smtp_server = response.data.result;
                         }
@@ -348,6 +369,7 @@
                     .then(response => {
                         this.$message.success(response.data.msg);
                         this.MailDialogFormVisible = false;
+                        console.log(response.data.msg);
                     })
                     .catch(error => {
                         this.$message.error(error.toString());
