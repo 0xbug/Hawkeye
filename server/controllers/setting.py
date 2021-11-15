@@ -1,13 +1,20 @@
+import smtplib
+import logging
+
 from flask import jsonify, request
 from flask_restful import Resource, reqparse, inputs
 from urllib.parse import urlparse
 from config.database import blacklist_col, result_col, query_col, notice_col, github_col, setting_col
+from task import send_mail
 from utils.hash import md5
 from utils.date import timestamp
 from github import Github, GithubException, BadCredentialsException
 import signal
 import os
 import requests
+
+from utils.log import logger
+from utils.notice import mail_notice
 
 
 class System(Resource):
@@ -127,6 +134,7 @@ class SMTPServer(Resource):
         data = {'status': 200, 'msg': '获取信息成功', 'result': result}
         return jsonify(data)
 
+
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('from', type=str, help='From (sender email)')
@@ -230,14 +238,39 @@ class Notice(Resource):
         return jsonify(data)
 
     def post(self):
+        print("发送测试邮件")
         parser = reqparse.RequestParser()
         parser.add_argument('mail', type=str, help='')
+        parser.add_argument('test', type=str, help='')
         args = parser.parse_args()
         mail = args.get('mail')
-        mail = mail.strip().replace(' ', '')
-        notice_col.insert_one({'_id': md5(mail), 'mail': mail})
-        result = list(notice_col.find({}, {'_id': 0}))
-        data = {'status': 201, 'msg': '添加成功', 'result': result}
+        test = args.get('test')
+        try:
+            if len(test) > 0:
+                result = "send email test"
+
+                smtp_config = setting_col.find_one({'key': 'mail'})
+                receivers = mail.split('9999999')
+                send_user = smtp_config.get('from')
+                if send_user not in receivers:
+                    receivers.append(send_user)
+                try:
+                    if mail_notice(smtp_config, receivers, "test email content，恭喜，告警邮箱配置成功"):
+                        logger.info('邮件发送成功')
+                    else:
+                        logger.critical('Error: 无法发送邮件，请检查邮箱配置是否正确')
+
+                except smtplib.SMTPException as error:
+                    logger.critical('Error: 无法发送邮件 {}'.format(error))
+
+                data = {'status': 200, 'msg': '测试邮件发送成功', 'result': result}
+        except:
+            mail = mail.strip().replace(' ', '')
+            notice_col.insert_one({'_id': md5(mail), 'mail': mail})
+            result = list(notice_col.find({}, {'_id': 0}))
+            data = {'status': 201, 'msg': '添加成功', 'result': result}
+            return jsonify(data)
+
         return jsonify(data)
 
     def delete(self):

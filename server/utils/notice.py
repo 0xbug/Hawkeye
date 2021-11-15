@@ -1,6 +1,7 @@
 import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
+from config.database import setting_col, notice_col
 
 
 class SMTPServer(object):
@@ -12,16 +13,18 @@ class SMTPServer(object):
         self.password = smtp_config.get('password')
         try:
             if self.tls:
-                self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
-            else:
                 self.smtp = smtplib.SMTP_SSL(self.host, self.port, timeout=300)
+                print(self.tls)
+                print("tls 已开启")
+            else:
+                self.smtp = smtplib.SMTP(self.host, self.port, timeout=300)
+                print("tls 已关闭")
+
         except Exception as error:
             print(error)
 
     def login(self):
         try:
-            if self.tls:
-                self.smtp.starttls()
             self.smtp.login(self.username, self.password)
         except Exception as error:
             print(error)
@@ -46,15 +49,30 @@ def mail_notice(smtp_config, receivers, content):
     """
 
     message = MIMEText(content, _subtype='html', _charset='utf-8')
-    message['From'] = Header('{}<{}>'.format(smtp_config.get('from'), smtp_config.get('username')), 'utf-8')
-    message['To'] = Header(';'.join(receivers), 'utf-8')
-    message['Subject'] = Header('[GitHub] 监控告警', 'utf-8')
+    message['From'] = Header('{}<{}>'.format(smtp_config.get('from'), smtp_config.get('username')))
+    message['To'] = Header(','.join(receivers))
+    message['Subject'] = Header('Github 监控邮件发送', 'utf-8')
     try:
         smtp = SMTPServer(smtp_config)
-        print('login')
         smtp.login()
         smtp.sendmail(receivers, message)
         return True
 
-    except smtplib.SMTPException:
+    except smtplib.SMTPException as e:
+        print("sendmail error:" + str(e))
         return False
+
+
+if __name__ == '__main__':
+    smtp_config = setting_col.find_one({'key': 'mail'})
+    receivers = [data.get('mail') for data in notice_col.find({})]
+    content = "这里是重要文档"
+
+    print("===========================")
+    print("Test email send function")
+    print(smtp_config.get('host'))
+    print(smtp_config.get('port'))
+    print(smtp_config.get('tls'))
+    print(smtp_config.get('from'))
+    print("===========================")
+    mail_notice(smtp_config, receivers, content)
